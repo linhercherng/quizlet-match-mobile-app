@@ -1,0 +1,8 @@
+{
+  "name": "quizlet-match-mobile-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/mobile-app.test.mjs"
+  }
+}

@@ -2,7 +2,14 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f1226">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="配對高手">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <title>配對高手 · Match</title>
 <style>
   :root{
@@ -24,7 +31,7 @@
     --ease:cubic-bezier(.16,1,.3,1);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
+  html,body{height:100%;overscroll-behavior-y:none;overflow-x:hidden}
   body{
     font-family:"Segoe UI",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
     color:var(--text);
@@ -131,6 +138,7 @@
   .deck-list{display:flex;flex-direction:column;gap:12px;margin-top:16px;max-height:520px;overflow:auto;padding-right:6px}
   .deck-item{
     display:flex;align-items:center;gap:15px;padding:17px 18px;border-radius:14px;cursor:pointer;
+    width:100%;color:var(--text);font:inherit;text-align:left;
     background:var(--surface-2);border:1px solid transparent;transition:var(--dur) var(--ease);
   }
   .deck-item:hover{border-color:var(--accent)}
@@ -164,7 +172,7 @@
     border:1.5px solid var(--line);color:var(--text);
     display:grid;place-items:center;text-align:center;padding:14px;font-size:17px;line-height:1.45;
     transition:transform var(--dur) var(--ease),border-color var(--dur),box-shadow var(--dur),opacity var(--dur);
-    user-select:none;
+    appearance:none;font-family:inherit;user-select:none;-webkit-tap-highlight-color:transparent;
   }
   .tile:hover{transform:translateY(-3px);border-color:var(--accent)}
   .tile.sel{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(0,210,255,.35);background:linear-gradient(180deg,#2a3170,#232a5c)}
@@ -276,6 +284,105 @@
   .toast.bad{border-color:var(--bad)}
   .sec-title{font-size:18px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
   .divider{height:1px;background:var(--line);margin:18px 0}
+
+  /* ---------- 可安裝 App / 手機介面 ---------- */
+  button,.tile,.deck-item{touch-action:manipulation}
+  button:focus-visible,.tile:focus-visible,.deck-item:focus-visible{
+    outline:3px solid var(--accent-2);outline-offset:3px;
+  }
+  .header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .install-btn{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+  .install-dialog{
+    width:min(92vw,430px);border:1px solid var(--line);border-radius:18px;padding:0;
+    color:var(--text);background:linear-gradient(180deg,var(--surface),var(--bg-2));
+    box-shadow:var(--shadow);
+  }
+  .install-dialog::backdrop{background:rgba(8,10,26,.78);backdrop-filter:blur(4px)}
+  .install-dialog-body{padding:24px}
+  .install-dialog h2{font-size:24px;margin-bottom:10px}
+  .install-dialog p{color:var(--muted);line-height:1.7}
+  .install-steps{margin:16px 0 20px;padding-left:22px;line-height:1.8;color:var(--text)}
+  .install-dialog-actions{display:flex;justify-content:flex-end;gap:10px}
+  @media(display-mode:standalone){#btnInstall{display:none}}
+
+  @media(max-width:600px){
+    :root{--radius:14px}
+    body{font-size:16px}
+    .wrap{
+      width:100%;padding:
+        max(12px,env(safe-area-inset-top))
+        max(10px,env(safe-area-inset-right))
+        max(28px,env(safe-area-inset-bottom))
+        max(10px,env(safe-area-inset-left));
+    }
+    header.top{display:grid;grid-template-columns:1fr;margin-bottom:14px;gap:10px}
+    .brand{gap:9px}
+    .logo{width:40px;height:40px;border-radius:12px;font-size:21px}
+    .brand h1{font-size:22px}
+    .brand p{font-size:12px;white-space:nowrap}
+    .header-actions{display:grid;grid-template-columns:auto 1fr;width:100%}
+    .install-btn{min-height:46px;padding:10px 13px;font-size:14px}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;width:100%;padding:4px}
+    .tab{min-height:44px;padding:8px 10px;font-size:14px}
+    .card{padding:14px;box-shadow:0 14px 34px -22px rgba(0,0,0,.85)}
+    .start-grid{gap:12px}
+    .start-grid .deck-list{max-height:34vh;min-height:156px}
+    .deck-list{gap:8px;margin-top:10px;padding-right:2px}
+    .deck-item{min-height:64px;padding:10px 11px;gap:10px;border-radius:11px}
+    .deck-emoji{width:42px;height:42px;border-radius:10px;font-size:22px}
+    .deck-meta b{font-size:16px}
+    .deck-meta span{font-size:12px}
+    .sec-title{font-size:16px;margin-bottom:10px}
+    .opt-line{align-items:flex-start;flex-direction:column;gap:8px;padding:10px 0}
+    .seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(58px,1fr));width:100%;gap:4px}
+    .seg button{min-height:44px;padding:8px 7px;font-size:14px}
+    .stat-strip{margin:12px 0;gap:7px}
+    .chip{padding:7px 9px;border-radius:9px;font-size:12px}
+    .chip b{font-size:15px}
+    .game-head{
+      position:sticky;top:max(6px,env(safe-area-inset-top));z-index:12;
+      margin:-4px -4px 10px;padding:8px;border:1px solid var(--line);border-radius:12px;
+      background:rgba(15,18,38,.94);backdrop-filter:blur(10px);
+    }
+    .game-head .row{gap:6px}
+    .game-head .btn{min-height:40px;padding:8px 10px}
+    .timer{font-size:29px;margin-left:auto}
+    .timer small{font-size:13px}
+    .board{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .tile{min-width:0;min-height:88px;padding:18px 8px 8px;border-radius:11px;font-size:15px;line-height:1.28;overflow-wrap:anywhere}
+    .tile .side{top:5px;left:7px;font-size:8px}
+    .vs-wrap{grid-template-columns:1fr;gap:10px}
+    .vs-panel{padding:10px}
+    .vs-board{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+    .vs-board .tile{min-height:68px;padding:14px 5px 5px;font-size:12px}
+    .vs-name{font-size:16px}.vs-timer{font-size:23px}
+    .vs-stats{margin-bottom:8px}
+    .spell-clue{padding:14px;margin-bottom:12px}
+    .spell-clue .txt{font-size:19px}
+    .slots{gap:6px;margin:6px 0 18px;min-height:52px}
+    .slot{width:42px;height:50px;border-radius:9px;font-size:22px}
+    .slot.sep{width:10px}
+    .letters{gap:7px;margin-bottom:16px}
+    .letter{min-width:46px;height:50px;padding:0 9px;border-radius:10px;font-size:22px}
+    .spell-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .spell-actions .btn{min-height:44px;padding:9px 7px}
+    .win{padding:28px 12px}
+    .win .big{font-size:52px}.win h2{font-size:25px}.win .time{font-size:42px}
+    .pair-row{display:grid;grid-template-columns:1fr auto}
+    .pair-row input:first-child{grid-column:1}
+    .pair-row input:nth-child(2){grid-column:1}
+    .pair-row .btn{grid-column:2;grid-row:1 / span 2;min-width:44px}
+    .toast{bottom:max(16px,env(safe-area-inset-bottom));width:calc(100% - 28px);text-align:center}
+    .countdown span{font-size:88px}
+    body.in-game header.top{display:none}
+  }
+
+  @media(max-width:340px){
+    .brand p{white-space:normal}
+    .header-actions{grid-template-columns:1fr}
+    .install-btn{justify-content:center}
+    .tile{font-size:14px}
+  }
 </style>
 </head>
 <body>
@@ -292,10 +399,13 @@
         <p>把字詞與意思快速配對 · 支援自建字庫</p>
       </div>
     </div>
-    <nav class="tabs">
-      <button class="tab active" data-tab="play">🎮 遊戲</button>
-      <button class="tab" data-tab="manage">📚 我的字庫</button>
-    </nav>
+    <div class="header-actions">
+      <button class="btn ghost sm install-btn" id="btnInstall" type="button">⬇ 安裝 App</button>
+      <nav class="tabs" aria-label="主要功能">
+        <button class="tab active" data-tab="play" type="button">🎮 遊戲</button>
+        <button class="tab" data-tab="manage" type="button">📚 我的字庫</button>
+      </nav>
+    </div>
   </header>
 
   <!-- ============ 遊戲分頁 ============ -->
@@ -385,7 +495,7 @@
           </div>
           <div class="timer"><span id="timeDisp">0.0</span><small>秒</small></div>
         </div>
-        <div class="board" id="board"></div>
+        <div class="board" id="board" aria-label="配對遊戲牌面"></div>
       </div>
     </div>
 
@@ -577,8 +687,20 @@
   </section>
 </div>
 
-<div class="toast" id="toast"></div>
-<div class="countdown" id="countdown"><span id="cdNum">3</span></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="countdown" id="countdown" aria-live="assertive"><span id="cdNum">3</span></div>
+
+<dialog class="install-dialog" id="installDialog" aria-labelledby="installTitle">
+  <div class="install-dialog-body">
+    <h2 id="installTitle">安裝「配對高手」</h2>
+    <p id="installMessage">安裝後會出現在手機主畫面，像一般 App 一樣全螢幕開啟，也能離線遊玩。</p>
+    <ol class="install-steps" id="installSteps"></ol>
+    <div class="install-dialog-actions">
+      <button class="btn ghost" id="btnInstallClose" type="button">稍後</button>
+      <button class="btn" id="btnInstallNative" type="button" hidden>立即安裝</button>
+    </div>
+  </div>
+</dialog>
 
 <script src="decks.js"></script>
 <script>
@@ -652,8 +774,10 @@ function renderDeckList(){
   if(!decks.length){ wrap.innerHTML='<div class="empty">還沒有字庫，去「我的字庫」建立一個吧</div>'; updateStartMeta(); return; }
   if(!decks.find(d=>d.id===selectedDeckId)) selectedDeckId=decks[0].id;
   decks.forEach(d=>{
-    const el=document.createElement("div");
+    const el=document.createElement("button");
+    el.type="button";
     el.className="deck-item"+(d.id===selectedDeckId?" sel":"");
+    el.setAttribute("aria-pressed", d.id===selectedDeckId?"true":"false");
     el.innerHTML=`<div class="deck-emoji">${d.emoji||"📘"}</div>
       <div class="deck-meta"><b>${esc(d.name)}</b><span>${d.pairs.length} 組字詞</span></div>`;
     el.onclick=()=>{ selectedDeckId=d.id; renderDeckList(); };
@@ -735,10 +859,13 @@ function newBoard(chosen, refs){
 function renderInto(g){
   const b=g.refs.boardEl; b.innerHTML="";
   g.cards.forEach((c,idx)=>{
-    const el=document.createElement("div");
+    const el=document.createElement("button");
+    el.type="button";
     el.className="tile";
     const tag=c.side==="term"?"字詞":"意思";
     el.innerHTML=`<span class="side">${tag}</span>${esc(c.text)}`;
+    el.setAttribute("aria-label", `${tag}：${c.text}`);
+    el.setAttribute("aria-pressed", "false");
     el.onclick=()=>pickIn(g,idx);
     c.el=el; c.matched=false;
     b.appendChild(el);
@@ -760,14 +887,16 @@ function pickIn(g, idx){
   if(g.locked||g.done)return;
   const c=g.cards[idx], el=c.el;
   if(c.matched)return;
-  if(g.sel===null){ g.sel=idx; el.classList.add("sel"); return; }
-  if(g.sel===idx){ el.classList.remove("sel"); g.sel=null; return; }
+  if(g.sel===null){ g.sel=idx; el.classList.add("sel"); el.setAttribute("aria-pressed","true"); return; }
+  if(g.sel===idx){ el.classList.remove("sel"); el.setAttribute("aria-pressed","false"); g.sel=null; return; }
 
   const a=g.cards[g.sel], bC=g.cards[idx];
   if(a.pid===bC.pid && a.side!==bC.side){
     a.matched=bC.matched=true;
     a.el.classList.remove("sel");
+    a.el.setAttribute("aria-pressed","false");
     a.el.classList.add("gone"); bC.el.classList.add("gone");
+    a.el.disabled=true; bC.el.disabled=true;
     g.sel=null; g.remain--;
     g.refs.remainEl.textContent=g.remain;
     if(g.remain===0) endBoard(g);
@@ -778,6 +907,8 @@ function pickIn(g, idx){
     setTimeout(()=>{
       a.el.classList.remove("sel","wrong");
       bC.el.classList.remove("sel","wrong");
+      a.el.setAttribute("aria-pressed","false");
+      bC.el.setAttribute("aria-pressed","false");
       g.sel=null; if(!g.done) g.locked=false;
     },520);
   }
@@ -920,7 +1051,11 @@ function renderSB(sb){
   const cur=sb.cur;
   const sl=sb.refs.slots; sl.innerHTML=""; sl.className="slots";
   cur.positions.forEach((p,pi)=>{
-    const d=document.createElement("div");
+    const d=document.createElement(!p.sep&&!p.locked&&p.tile!==null?"button":"div");
+    if(d.tagName==="BUTTON"){
+      d.type="button";
+      d.setAttribute("aria-label", `移除字母 ${cur.tiles[p.tile].ch}`);
+    }
     if(p.sep){ d.className="slot sep"; d.textContent=p.ch===" "?"":p.ch; }
     else if(p.locked){ d.className="slot locked"; d.textContent=p.ch; }
     else{
@@ -933,6 +1068,7 @@ function renderSB(sb){
   const lt=sb.refs.letters; lt.innerHTML="";
   cur.tiles.forEach((t,ti)=>{
     const b=document.createElement("button");
+    b.type="button";
     b.className="letter"+(t.used?" used":"");
     b.textContent=t.ch; b.onclick=()=>placeSB(sb,ti);
     lt.appendChild(b);
@@ -1126,7 +1262,11 @@ function renderSpell(){
   const cur=spellS.cur;
   const sl=$("#spellSlots"); sl.innerHTML=""; sl.className="slots";
   cur.positions.forEach((p,pi)=>{
-    const d=document.createElement("div");
+    const d=document.createElement(!p.sep&&!p.locked&&p.tile!==null?"button":"div");
+    if(d.tagName==="BUTTON"){
+      d.type="button";
+      d.setAttribute("aria-label", `移除字母 ${cur.tiles[p.tile].ch}`);
+    }
     if(p.sep){ d.className="slot sep"; d.textContent=p.ch===" "?"":p.ch; }
     else if(p.locked){ d.className="slot locked"; d.textContent=p.ch; }
     else{
@@ -1139,6 +1279,7 @@ function renderSpell(){
   const lt=$("#spellLetters"); lt.innerHTML="";
   cur.tiles.forEach((t,ti)=>{
     const b=document.createElement("button");
+    b.type="button";
     b.className="letter"+(t.used?" used":"");
     b.textContent=t.ch;
     b.onclick=()=>placeSpell(ti);
@@ -1268,6 +1409,8 @@ function showScreen(name){
   $("#screen-spell").style.display    = name==="spell"?"block":"none";
   $("#screen-spellwin").style.display = name==="spellwin"?"block":"none";
   $("#screen-vspell").style.display   = name==="vspell"?"block":"none";
+  document.body.classList.toggle("in-game", name!=="start");
+  window.scrollTo(0,0);
 }
 
 /* ================= 字庫管理 ================= */
@@ -1278,8 +1421,10 @@ function renderMgr(){
   const wrap=$("#mgrDeckList"); wrap.innerHTML="";
   if(!decks.length){ wrap.innerHTML='<div class="empty">還沒有字庫</div>'; }
   decks.forEach(d=>{
-    const el=document.createElement("div");
+    const el=document.createElement("button");
+    el.type="button";
     el.className="deck-item"+(d.id===editId?" sel":"");
+    el.setAttribute("aria-pressed", d.id===editId?"true":"false");
     el.innerHTML=`<div class="deck-emoji">${d.emoji||"📘"}</div>
       <div class="deck-meta"><b>${esc(d.name)}</b><span>${d.pairs.length} 組</span></div>`;
     el.onclick=()=>openEditor(d.id);
@@ -1400,6 +1545,60 @@ function initBgDeco(){
     s.style.setProperty("--op", (0.14+Math.random()*0.16).toFixed(2));
     host.appendChild(s);
   }
+}
+
+/* ================= 安裝 App / 離線 ================= */
+let deferredInstallPrompt=null;
+const installButton=$("#btnInstall");
+const installDialog=$("#installDialog");
+const installSteps=$("#installSteps");
+const installNative=$("#btnInstallNative");
+const standalone=window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone===true;
+
+function closeInstallDialog(){
+  if(typeof installDialog.close==="function") installDialog.close();
+  else installDialog.removeAttribute("open");
+}
+function showInstallHelp(){
+  const isiOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  const steps=isiOS
+    ? ["用 Safari 開啟這個遊戲。","點下方的分享按鈕。","選擇「加入主畫面」，再點「新增」。"]
+    : ["開啟瀏覽器選單。","選擇「安裝應用程式」或「新增至主畫面」。","確認安裝後，從手機主畫面開啟。"];
+  installSteps.innerHTML=steps.map(step=>`<li>${step}</li>`).join("");
+  installNative.hidden=!deferredInstallPrompt;
+  if(typeof installDialog.showModal==="function") installDialog.showModal();
+  else installDialog.setAttribute("open","");
+}
+async function requestNativeInstall(){
+  if(!deferredInstallPrompt){ showInstallHelp(); return; }
+  const prompt=deferredInstallPrompt;
+  deferredInstallPrompt=null;
+  closeInstallDialog();
+  await prompt.prompt();
+  await prompt.userChoice;
+}
+
+installButton.hidden=standalone;
+installButton.onclick=()=>{
+  if(standalone){ toast("已安裝在手機主畫面","good"); return; }
+  if(deferredInstallPrompt) requestNativeInstall();
+  else showInstallHelp();
+};
+$("#btnInstallClose").onclick=closeInstallDialog;
+installNative.onclick=requestNativeInstall;
+installDialog.addEventListener("click",e=>{ if(e.target===installDialog) closeInstallDialog(); });
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault();
+  deferredInstallPrompt=e;
+  installButton.hidden=false;
+});
+window.addEventListener("appinstalled",()=>{
+  deferredInstallPrompt=null;
+  installButton.hidden=true;
+  toast("App 已安裝完成 ✓","good");
+});
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));
 }
 
 /* ================= 啟動 ================= */
