@@ -9,9 +9,13 @@
 - iPhone 安全區與 Android 手勢列適配
 - 鍵盤焦點與螢幕閱讀器標示
 
+## 直接開啟
+
+[https://linhercherng.github.io/quizlet-match-mobile-app/](https://linhercherng.github.io/quizlet-match-mobile-app/)
+
 ## 手機安裝
 
-PWA 必須放在 HTTPS 網址才能安裝。把這個資料夾部署到 GitHub Pages、Cloudflare Pages、Netlify 或其他靜態網站服務後，在手機瀏覽器開啟網址：
+在手機瀏覽器開啟上方網址：
 
 - Android Chrome：點頁面上的「安裝 App」，或瀏覽器選單 →「安裝應用程式」。
 - iPhone Safari：分享 →「加入主畫面」→「新增」。
