@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>配對高手 · Match</title>
+<style>
+  :root{
+    --bg:#0f1226;
+    --bg-2:#171a38;
+    --surface:#1e2246;
+    --surface-2:#262b57;
+    --line:#343a70;
+    --text:#eef0ff;
+    --muted:#a5abd8;
+    --accent:#6c5ce7;
+    --accent-2:#00d2ff;
+    --good:#2ecc71;
+    --bad:#ff5c7a;
+    --gold:#ffd166;
+    --radius:16px;
+    --shadow:0 18px 45px -18px rgba(0,0,0,.7);
+    --dur:220ms;
+    --ease:cubic-bezier(.16,1,.3,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(1100px 600px at 12% -8%, rgba(108,92,231,.32), transparent 60%),
+      radial-gradient(900px 620px at 110% 0%, rgba(0,210,255,.18), transparent 55%),
+      linear-gradient(180deg,var(--bg),var(--bg-2));
+    min-height:100vh;
+    font-size:17px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1320px;margin:0 auto;padding:26px 24px 60px;position:relative;z-index:1}
+
+  /* ---------- 動態背景 ---------- */
+  .bg-deco{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+  .bg-deco .blob{position:absolute;width:440px;height:440px;border-radius:50%;
+    filter:blur(72px);opacity:.4;will-change:transform}
+  .bg-deco .b1{background:radial-gradient(circle,rgba(108,92,231,.7),transparent 70%);
+    top:-90px;left:-70px;animation:blobDrift 26s ease-in-out infinite}
+  .bg-deco .b2{background:radial-gradient(circle,rgba(0,210,255,.55),transparent 70%);
+    top:18%;right:-120px;animation:blobDrift 33s ease-in-out infinite reverse}
+  .bg-deco .b3{background:radial-gradient(circle,rgba(255,92,122,.42),transparent 70%);
+    bottom:-140px;left:26%;animation:blobDrift 30s ease-in-out infinite}
+  .bg-deco .b4{background:radial-gradient(circle,rgba(46,204,113,.35),transparent 70%);
+    top:44%;left:40%;width:340px;height:340px;animation:blobDrift 38s ease-in-out infinite reverse}
+  @keyframes blobDrift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(46px,-34px) scale(1.16)}}
+  .femoji{position:absolute;top:0;left:var(--x);font-size:var(--sz);opacity:0;
+    will-change:transform,opacity;animation:floatUp var(--dur) linear infinite;animation-delay:var(--delay)}
+  @keyframes floatUp{
+    0%{transform:translateY(106vh) translateX(0) rotate(0deg);opacity:0}
+    8%{opacity:var(--op)}
+    92%{opacity:var(--op)}
+    100%{transform:translateY(-16vh) translateX(var(--sway)) rotate(var(--rot));opacity:0}
+  }
+  @media(prefers-reduced-motion:reduce){ .femoji,.blob{animation:none!important} .femoji{opacity:var(--op)} }
+
+  header.top{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    margin-bottom:22px;flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{
+    width:46px;height:46px;border-radius:14px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    box-shadow:0 10px 24px -8px rgba(108,92,231,.9);font-size:24px;
+    animation:logoPulse 4.5s ease-in-out infinite;
+  }
+  @keyframes logoPulse{
+    0%,100%{box-shadow:0 10px 24px -8px rgba(108,92,231,.9);transform:rotate(0deg)}
+    50%{box-shadow:0 14px 32px -6px rgba(0,210,255,.85);transform:rotate(-6deg)}
+  }
+  @media(prefers-reduced-motion:reduce){ .logo{animation:none} }
+  .brand h1{font-size:27px;letter-spacing:.5px}
+  .brand p{font-size:15px;color:var(--muted);margin-top:2px}
+
+  .tabs{display:flex;gap:6px;background:var(--surface);padding:6px;border-radius:14px;border:1px solid var(--line)}
+  .tab{
+    border:0;background:transparent;color:var(--muted);font-size:16px;font-weight:600;
+    padding:10px 18px;border-radius:10px;cursor:pointer;transition:var(--dur) var(--ease);
+  }
+  .tab:hover{color:var(--text)}
+  .tab.active{background:linear-gradient(135deg,var(--accent),#8a7bff);color:#fff;box-shadow:0 8px 18px -8px rgba(108,92,231,.9)}
+
+  .panel{display:none;animation:fade .35s var(--ease)}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---------- 卡片 / 通用 ---------- */
+  .card{
+    background:linear-gradient(180deg,rgba(30,34,70,.76),rgba(23,26,56,.78));
+    border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:22px;
+    backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);
+  }
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  label.fld{font-size:15px;color:var(--muted);display:block;margin-bottom:6px}
+  input,select,textarea{
+    width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);
+    padding:12px 14px;border-radius:11px;font-size:16px;font-family:inherit;transition:var(--dur) var(--ease);
+  }
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,92,231,.28)}
+  textarea{resize:vertical;min-height:130px;line-height:1.6}
+  .btn{
+    border:0;cursor:pointer;font-weight:700;font-size:16px;color:#fff;
+    padding:12px 22px;border-radius:12px;transition:var(--dur) var(--ease);
+    background:linear-gradient(135deg,var(--accent),#8a7bff);box-shadow:0 10px 22px -10px rgba(108,92,231,.9);
+  }
+  .btn:hover{transform:translateY(-2px)}
+  .btn:active{transform:translateY(0)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text);box-shadow:none}
+  .btn.ghost:hover{border-color:var(--accent);background:var(--surface-2)}
+  .btn.sm{padding:8px 15px;font-size:15px;border-radius:10px}
+  .btn.danger{background:linear-gradient(135deg,#ff5c7a,#ff8a5c)}
+  .btn.good{background:linear-gradient(135deg,var(--good),#1abc9c)}
+
+  /* ---------- 開始畫面 ---------- */
+  .start-grid{display:grid;grid-template-columns:1.7fr .85fr;gap:22px}
+  @media(max-width:820px){.start-grid{grid-template-columns:1fr}}
+  @media(min-width:821px){
+    .start-grid{height:calc(100vh - 176px);min-height:460px;grid-template-rows:minmax(0,1fr)}
+    .start-grid>.card{display:flex;flex-direction:column;min-height:0}
+    .start-grid .deck-list{flex:1;min-height:0;max-height:none}
+  }
+  .deck-list{display:flex;flex-direction:column;gap:12px;margin-top:16px;max-height:520px;overflow:auto;padding-right:6px}
+  .deck-item{
+    display:flex;align-items:center;gap:15px;padding:17px 18px;border-radius:14px;cursor:pointer;
+    background:var(--surface-2);border:1px solid transparent;transition:var(--dur) var(--ease);
+  }
+  .deck-item:hover{border-color:var(--accent)}
+  .deck-item.sel{border-color:var(--accent);background:linear-gradient(135deg,rgba(108,92,231,.25),var(--surface-2))}
+  .deck-emoji{width:52px;height:52px;border-radius:13px;background:var(--bg);display:grid;place-items:center;font-size:26px;flex:0 0 auto}
+  .deck-meta{flex:1;min-width:0}
+  .deck-meta b{display:block;font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .deck-meta span{font-size:14px;color:var(--muted)}
+
+  .opt-line{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px dashed var(--line)}
+  .opt-line:last-child{border-bottom:0}
+  .seg{display:flex;flex-wrap:wrap;gap:6px;background:var(--bg);padding:5px;border-radius:11px;border:1px solid var(--line)}
+  .seg button{border:0;background:transparent;color:var(--muted);padding:8px 15px;border-radius:8px;cursor:pointer;font-weight:600;font-size:15px}
+  .seg button.on{background:var(--accent);color:#fff}
+
+  .stat-strip{display:flex;gap:10px;margin:16px 0;flex-wrap:wrap}
+  .chip{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 15px;font-size:15px;color:var(--muted)}
+  .chip b{color:var(--text);font-size:18px;font-variant-numeric:tabular-nums}
+
+  /* ---------- 遊戲盤 ---------- */
+  .game-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .timer{font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--gold);text-shadow:0 4px 16px rgba(255,209,102,.3)}
+  .timer small{font-size:18px;color:var(--muted);font-weight:600;margin-left:4px}
+  .board{
+    display:grid;gap:16px;
+    grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  }
+  .tile{
+    position:relative;min-height:118px;border-radius:14px;cursor:pointer;
+    background:linear-gradient(180deg,var(--surface-2),var(--surface));
+    border:1.5px solid var(--line);color:var(--text);
+    display:grid;place-items:center;text-align:center;padding:14px;font-size:17px;line-height:1.45;
+    transition:transform var(--dur) var(--ease),border-color var(--dur),box-shadow var(--dur),opacity var(--dur);
+    user-select:none;
+  }
+  .tile:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .tile.sel{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(0,210,255,.35);background:linear-gradient(180deg,#2a3170,#232a5c)}
+  .tile.wrong{animation:shake .4s;border-color:var(--bad);box-shadow:0 0 0 3px rgba(255,92,122,.4)}
+  .tile.gone{opacity:0;transform:scale(.6);pointer-events:none}
+  .tile .side{position:absolute;top:8px;left:10px;font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+
+  /* ---------- 完成畫面 ---------- */
+  .win{text-align:center;padding:36px 20px}
+  .win .big{font-size:66px}
+  .win h2{font-size:31px;margin:12px 0}
+  .win .time{font-size:52px;font-weight:800;color:var(--gold);margin:12px 0}
+  .win .best{font-size:17px}
+  .win .best{color:var(--muted);margin-bottom:22px}
+  .best-flag{color:var(--gold);font-weight:700}
+
+  /* ---------- 雙人對戰 ---------- */
+  .vs-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.vs-wrap{grid-template-columns:1fr}}
+  .vs-panel{padding:16px;position:relative;overflow:hidden}
+  .vs-panel::before{content:"";position:absolute;top:0;left:0;right:0;height:4px}
+  .vs-panel.p1::before{background:linear-gradient(90deg,var(--accent-2),#5ad1ff)}
+  .vs-panel.p2::before{background:linear-gradient(90deg,var(--bad),#ff9a6b)}
+  .vs-panel.dim{opacity:.5;filter:grayscale(.4)}
+  .vs-panel.champ{box-shadow:0 0 0 3px var(--gold),var(--shadow)}
+  .vs-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .vs-name{font-size:19px;font-weight:800}
+  .p1 .vs-name{color:var(--accent-2)}
+  .p2 .vs-name{color:var(--bad)}
+  .vs-timer{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums}
+  .p1 .vs-timer{color:var(--accent-2)}
+  .p2 .vs-timer{color:var(--bad)}
+  .vs-stats{display:flex;gap:14px;font-size:14px;color:var(--muted);margin-bottom:12px}
+  .vs-stats b{color:var(--text);font-size:16px;font-variant-numeric:tabular-nums}
+  .vs-board{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:9px}
+  .vs-board .tile{min-height:74px;font-size:14px;padding:9px;border-radius:11px}
+  .vs-board .tile .side{font-size:8px;top:5px;left:7px}
+  .p1 .tile.sel{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(0,210,255,.35)}
+  .p2 .tile.sel{border-color:var(--bad);box-shadow:0 0 0 3px rgba(255,92,122,.4)}
+
+  .countdown{
+    position:fixed;inset:0;background:rgba(8,10,26,.82);backdrop-filter:blur(3px);
+    display:none;place-items:center;z-index:60;
+  }
+  .countdown.show{display:grid}
+  .countdown span{font-size:120px;font-weight:900;color:#fff;
+    text-shadow:0 12px 40px rgba(108,92,231,.9);animation:pop .6s var(--ease)}
+  @keyframes pop{0%{transform:scale(.3);opacity:0}40%{transform:scale(1.1);opacity:1}100%{transform:scale(1);opacity:1}}
+
+  /* ---------- 拼字模式 ---------- */
+  .spell-clue{
+    background:linear-gradient(135deg,rgba(108,92,231,.22),var(--surface-2));
+    border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center;margin-bottom:18px;
+  }
+  .spell-clue .lbl{font-size:12px;color:var(--muted);letter-spacing:2px;margin-bottom:8px}
+  .spell-clue .txt{font-size:22px;font-weight:700;line-height:1.5}
+  .slots{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:8px 0 28px;min-height:66px}
+  .slot{width:56px;height:66px;border-radius:12px;border:2px solid var(--line);background:var(--bg);
+    display:grid;place-items:center;font-size:28px;font-weight:800;transition:var(--dur) var(--ease)}
+  .slot.sep{border:0;background:transparent;width:18px;color:var(--muted);font-size:22px}
+  .slot.filled{border-color:var(--accent-2);background:var(--surface-2);cursor:pointer}
+  .slots.good .slot.filled{border-color:var(--good);box-shadow:0 0 0 3px rgba(46,204,113,.3)}
+  .slots.bad{animation:shake .4s}
+  .slots.bad .slot.filled{border-color:var(--bad);box-shadow:0 0 0 3px rgba(255,92,122,.35)}
+  .letters{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:24px}
+  .letter{min-width:60px;height:64px;padding:0 14px;border-radius:13px;border:1.5px solid var(--line);
+    background:linear-gradient(180deg,var(--surface-2),var(--surface));color:var(--text);
+    font-size:28px;font-weight:800;cursor:pointer;transition:var(--dur) var(--ease);font-family:inherit}
+  .letter:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .letter.used{opacity:.22;pointer-events:none;transform:scale(.9)}
+  .spell-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .slot.locked{border-color:var(--good);background:rgba(46,204,113,.14);color:var(--good);cursor:default}
+  #spellCombo.hot{color:var(--gold)}
+  .chip.pulse{animation:chipPulse .4s var(--ease)}
+  @keyframes chipPulse{0%{transform:scale(1)}45%{transform:scale(1.22)}100%{transform:scale(1)}}
+  .confetti-piece{position:fixed;top:-14px;width:10px;height:14px;z-index:70;pointer-events:none;
+    border-radius:2px;animation:confFall linear forwards}
+  @keyframes confFall{to{transform:translateY(110vh) rotate(720deg);opacity:.85}}
+  .opt-hidden{display:none!important}
+
+  /* ---------- 對戰拼字 ---------- */
+  .sb-clue{background:linear-gradient(135deg,rgba(108,92,231,.2),var(--surface-2));
+    border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;
+    font-size:18px;font-weight:700;line-height:1.4;margin-bottom:14px;min-height:26px}
+  #screen-vspell .slots{margin:4px 0 14px;min-height:52px;gap:8px}
+  #screen-vspell .slot{width:44px;height:52px;font-size:22px;border-radius:10px}
+  #screen-vspell .slot.sep{width:12px}
+  #screen-vspell .letters{gap:8px;margin-bottom:14px}
+  #screen-vspell .letter{min-width:46px;height:50px;font-size:22px;border-radius:11px;padding:0 10px}
+  #screen-vspell .p2 .slot.filled{border-color:var(--bad);box-shadow:0 0 0 3px rgba(255,92,122,.3)}
+
+  /* ---------- 管理字庫 ---------- */
+  .mgr-grid{display:grid;grid-template-columns:380px 1fr;gap:20px}
+  @media(max-width:820px){.mgr-grid{grid-template-columns:1fr}}
+  .pair-row{display:flex;gap:8px;margin-bottom:8px}
+  .pair-row input{flex:1}
+  .pair-row .btn{flex:0 0 auto}
+  .hint{font-size:14px;color:var(--muted);line-height:1.7;margin-top:6px}
+  .empty{color:var(--muted);text-align:center;padding:30px;font-size:16px}
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--surface-2);border:1px solid var(--line);color:var(--text);
+    padding:12px 20px;border-radius:12px;box-shadow:var(--shadow);opacity:0;pointer-events:none;
+    transition:var(--dur) var(--ease);z-index:50;font-size:14px;font-weight:600;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.good{border-color:var(--good)}
+  .toast.bad{border-color:var(--bad)}
+  .sec-title{font-size:18px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .divider{height:1px;background:var(--line);margin:18px 0}
+</style>
+</head>
+<body>
+<div class="bg-deco" id="bgDeco" aria-hidden="true">
+  <span class="blob b1"></span><span class="blob b2"></span>
+  <span class="blob b3"></span><span class="blob b4"></span>
+</div>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo">🎯</div>
+      <div>
+        <h1>配對高手</h1>
+        <p>把字詞與意思快速配對 · 支援自建字庫</p>
+      </div>
+    </div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="play">🎮 遊戲</button>
+      <button class="tab" data-tab="manage">📚 我的字庫</button>
+    </nav>
+  </header>
+
+  <!-- ============ 遊戲分頁 ============ -->
+  <section class="panel active" id="tab-play">
+    <!-- 開始畫面 -->
+    <div id="screen-start">
+      <div class="start-grid">
+        <div class="card">
+          <div class="sec-title">📖 選擇字庫</div>
+          <div class="deck-list" id="deckList"></div>
+        </div>
+        <div class="card">
+          <div class="sec-title">⚙️ 遊戲設定</div>
+          <div class="opt-line">
+            <span>對戰方式</span>
+            <div class="seg" id="segPlayers">
+              <button data-p="solo" class="on">👤 單人</button>
+              <button data-p="vs">⚔️ 對戰</button>
+            </div>
+          </div>
+          <div class="opt-line">
+            <span>遊戲類型</span>
+            <div class="seg" id="segType">
+              <button data-g="match" class="on">🃏 配對</button>
+              <button data-g="spell">🔤 拼字</button>
+            </div>
+          </div>
+          <div class="opt-line">
+            <span>每輪題數</span>
+            <div class="seg" id="segCount">
+              <button data-n="4">4</button>
+              <button data-n="6" class="on">6</button>
+              <button data-n="8">8</button>
+              <button data-n="10">10</button>
+            </div>
+          </div>
+          <div class="opt-line" id="lineDir">
+            <span>配對方向</span>
+            <div class="seg" id="segDir">
+              <button data-d="both" class="on">雙向</button>
+              <button data-d="term">字→意</button>
+            </div>
+          </div>
+          <div id="spellOpts" class="opt-hidden">
+            <div class="opt-line" id="lineClue">
+              <span>提示方式</span>
+              <div class="seg" id="segClue">
+                <button data-c="text" class="on">文字</button>
+                <button data-c="audio">🔊 聽寫</button>
+              </div>
+            </div>
+            <div class="opt-line" id="lineDiff">
+              <span>難度（填空）</span>
+              <div class="seg" id="segDiff">
+                <button data-f="easy">簡單</button>
+                <button data-f="mid">中等</button>
+                <button data-f="hard" class="on">困難</button>
+              </div>
+            </div>
+            <div class="opt-line" id="lineRule">
+              <span>挑戰規則</span>
+              <div class="seg" id="segRule">
+                <button data-r="survival" class="on">❤️ 生存</button>
+                <button data-r="timeattack">⏱️ 限時</button>
+                <button data-r="practice">🎯 練習</button>
+              </div>
+            </div>
+          </div>
+          <div class="stat-strip">
+            <div class="chip">此字庫 <b id="deckSize">0</b> 組</div>
+            <div class="chip">最佳 <b id="deckBest">—</b></div>
+          </div>
+          <button class="btn" id="btnStart" style="width:100%;margin-top:6px">開始遊戲 ▸</button>
+          <p class="hint" id="startHint">配對成功的卡片會消失，全部清空即完成，用最短時間刷新紀錄！</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 遊戲中 -->
+    <div id="screen-game" style="display:none">
+      <div class="card">
+        <div class="game-head">
+          <div class="row">
+            <button class="btn ghost sm" id="btnQuit">✕ 結束</button>
+            <span class="chip">剩餘 <b id="remain">0</b></span>
+            <span class="chip">失誤 <b id="miss">0</b></span>
+          </div>
+          <div class="timer"><span id="timeDisp">0.0</span><small>秒</small></div>
+        </div>
+        <div class="board" id="board"></div>
+      </div>
+    </div>
+
+    <!-- 雙人對戰 -->
+    <div id="screen-vs" style="display:none">
+      <div class="game-head" style="margin-bottom:12px">
+        <button class="btn ghost sm" id="btnQuitVs">✕ 結束對戰</button>
+        <span class="chip">⚔️ 同一份題目，看誰先全部配對完成！</span>
+      </div>
+      <div class="vs-wrap">
+        <div class="card vs-panel p1" id="panelP1">
+          <div class="vs-head">
+            <span class="vs-name">🔵 玩家 1</span>
+            <span class="vs-timer" id="timeP1">0.0</span>
+          </div>
+          <div class="vs-stats"><span>剩餘 <b id="remainP1">0</b></span><span>失誤 <b id="missP1">0</b></span></div>
+          <div class="board vs-board" id="boardP1"></div>
+        </div>
+        <div class="card vs-panel p2" id="panelP2">
+          <div class="vs-head">
+            <span class="vs-name">🔴 玩家 2</span>
+            <span class="vs-timer" id="timeP2">0.0</span>
+          </div>
+          <div class="vs-stats"><span>剩餘 <b id="remainP2">0</b></span><span>失誤 <b id="missP2">0</b></span></div>
+          <div class="board vs-board" id="boardP2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 對戰拼字 -->
+    <div id="screen-vspell" style="display:none">
+      <div class="game-head" style="margin-bottom:12px">
+        <button class="btn ghost sm" id="btnQuitVspell">✕ 結束對戰</button>
+        <span class="chip">⚔️ 同一批單字，看誰先全部拼對！</span>
+      </div>
+      <div class="vs-wrap">
+        <div class="card vs-panel p1" id="sbPanelP1">
+          <div class="vs-head">
+            <span class="vs-name">🔵 玩家 1</span>
+            <span class="vs-timer" id="sbTimeP1">0.0</span>
+          </div>
+          <div class="vs-stats"><span>第 <b id="sbIdxP1">1</b>/<b id="sbTotalP1">0</b> 字</span></div>
+          <div class="sb-clue" id="sbClueP1">—</div>
+          <div class="slots" id="sbSlotsP1"></div>
+          <div class="letters" id="sbLettersP1"></div>
+          <div class="spell-actions">
+            <button class="btn ghost sm" id="btnSbBackP1">⌫ 退一格</button>
+            <button class="btn ghost sm" id="btnSbClearP1">清空</button>
+          </div>
+        </div>
+        <div class="card vs-panel p2" id="sbPanelP2">
+          <div class="vs-head">
+            <span class="vs-name">🔴 玩家 2</span>
+            <span class="vs-timer" id="sbTimeP2">0.0</span>
+          </div>
+          <div class="vs-stats"><span>第 <b id="sbIdxP2">1</b>/<b id="sbTotalP2">0</b> 字</span></div>
+          <div class="sb-clue" id="sbClueP2">—</div>
+          <div class="slots" id="sbSlotsP2"></div>
+          <div class="letters" id="sbLettersP2"></div>
+          <div class="spell-actions">
+            <button class="btn ghost sm" id="btnSbBackP2">⌫ 退一格</button>
+            <button class="btn ghost sm" id="btnSbClearP2">清空</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 對戰結果 -->
+    <div id="screen-vswin" style="display:none">
+      <div class="card win">
+        <div class="big" id="vsWinEmoji">🏆</div>
+        <h2 id="vsWinTitle">玩家 1 獲勝！</h2>
+        <div class="time"><span id="vsWinTime">0.0</span> 秒</div>
+        <div class="best" id="vsWinSub"></div>
+        <div class="row" style="justify-content:center">
+          <button class="btn good" id="btnAgainVs">再戰一場 ↻</button>
+          <button class="btn ghost" id="btnBackStartVs">回選單</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 拼字模式 -->
+    <div id="screen-spell" style="display:none">
+      <div class="card">
+        <div class="game-head">
+          <div class="row">
+            <button class="btn ghost sm" id="btnQuitSpell">✕ 結束</button>
+            <span class="chip">第 <b id="spellIdx">1</b><span id="spellTotalWrap">/<b id="spellTotal">0</b></span> 字</span>
+            <span class="chip" id="spellHeartsChip">❤️❤️❤️</span>
+            <span class="chip">連擊 <b id="spellCombo">0</b></span>
+            <span class="chip">分數 <b id="spellScore">0</b></span>
+            <span class="chip">失誤 <b id="spellMiss">0</b></span>
+          </div>
+          <div class="timer"><span id="spellTime">0.0</span><small id="spellTimeUnit">秒</small></div>
+        </div>
+        <div class="spell-clue">
+          <div class="lbl" id="spellLbl">拼出這個字</div>
+          <div class="txt" id="spellClue">—</div>
+          <button class="btn ghost sm" id="btnReplay" style="margin-top:12px;display:none">🔊 再聽一次</button>
+        </div>
+        <div class="slots" id="spellSlots"></div>
+        <div class="letters" id="spellLetters"></div>
+        <div class="spell-actions">
+          <button class="btn ghost sm" id="btnSpellBack">⌫ 退一格</button>
+          <button class="btn ghost sm" id="btnSpellClear">清空</button>
+          <button class="btn ghost sm" id="btnSpellHint">💡 提示</button>
+          <button class="btn ghost sm" id="btnSpellSkip">跳過 »</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 拼字完成 -->
+    <div id="screen-spellwin" style="display:none">
+      <div class="card win">
+        <div class="big" id="spellWinEmoji">🎉</div>
+        <h2 id="spellWinTitle">拼字完成！</h2>
+        <div class="time"><span id="spellWinTime">0.0</span> 秒</div>
+        <div class="best" id="spellWinSub"></div>
+        <div class="row" style="justify-content:center">
+          <button class="btn good" id="btnAgainSpell">再玩一次 ↻</button>
+          <button class="btn ghost" id="btnBackStartSpell">回選單</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 完成 -->
+    <div id="screen-win" style="display:none">
+      <div class="card win">
+        <div class="big" id="winEmoji">🏆</div>
+        <h2 id="winTitle">全部配對完成！</h2>
+        <div class="time"><span id="winTime">0.0</span> 秒</div>
+        <div class="best" id="winBest"></div>
+        <div class="row" style="justify-content:center">
+          <button class="btn good" id="btnAgain">再玩一次 ↻</button>
+          <button class="btn ghost" id="btnBackStart">回選單</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 字庫管理分頁 ============ -->
+  <section class="panel" id="tab-manage">
+    <div class="mgr-grid">
+      <div class="card">
+        <div class="sec-title">📚 字庫列表</div>
+        <div class="deck-list" id="mgrDeckList" style="max-height:420px"></div>
+        <div class="divider"></div>
+        <button class="btn" id="btnNewDeck" style="width:100%">＋ 建立新字庫</button>
+      </div>
+
+      <div class="card" id="editorCard">
+        <div id="noDeck" class="empty">← 選一個字庫來編輯，或建立新字庫</div>
+
+        <div id="editor" style="display:none">
+          <div class="row" style="margin-bottom:14px">
+            <div style="flex:0 0 70px">
+              <label class="fld">圖示</label>
+              <input id="edEmoji" maxlength="2" style="text-align:center;font-size:20px" value="📘">
+            </div>
+            <div style="flex:1;min-width:160px">
+              <label class="fld">字庫名稱</label>
+              <input id="edName" placeholder="例如：多益核心單字">
+            </div>
+          </div>
+
+          <div class="sec-title" style="justify-content:space-between">
+            <span>✏️ 字詞配對 <span class="hint" style="margin:0">(<b id="pairCount">0</b> 組)</span></span>
+            <button class="btn ghost sm" id="btnAddPair">＋ 一組</button>
+          </div>
+          <div id="pairs"></div>
+
+          <div class="divider"></div>
+          <div class="sec-title">⚡ 批次匯入</div>
+          <p class="hint" style="margin-top:0">一行一組，用 <b>逗號</b>、<b>Tab</b> 或 <b>=</b> 分隔字與意思。例如：<br><code>apple, 蘋果</code> 或 <code>run = 跑步</code></p>
+          <textarea id="bulk" placeholder="apple, 蘋果&#10;banana, 香蕉&#10;study = 學習"></textarea>
+          <div class="row" style="margin-top:10px">
+            <button class="btn sm" id="btnImport">匯入到下方</button>
+            <button class="btn ghost sm" id="btnReplace">取代全部</button>
+          </div>
+
+          <div class="divider"></div>
+          <div class="row" style="justify-content:space-between">
+            <button class="btn danger sm" id="btnDelDeck">🗑 刪除此字庫</button>
+            <button class="btn good" id="btnSaveDeck">💾 儲存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="countdown" id="countdown"><span id="cdNum">3</span></div>
+
+<script src="decks.js"></script>
+<script>
+"use strict";
+/* ================= 資料層 ================= */
+const LS_KEY = "matchgame.decks.v3";
+const LS_BEST = "matchgame.best.v3";
+
+/* 若 decks.js 未載入，退回內建的基礎字庫 */
+const FALLBACK_DECKS = [
+  { emoji:"🐶", name:"動物 Animals", pairs:[
+    ["dog","狗"],["cat","貓"],["bird","鳥"],["fish","魚"],
+    ["pig","豬"],["cow","牛"],["duck","鴨子"],["rabbit","兔子"]
+  ]},
+  { emoji:"🎨", name:"顏色 Colors", pairs:[
+    ["red","紅色"],["blue","藍色"],["yellow","黃色"],["green","綠色"],
+    ["black","黑色"],["white","白色"],["pink","粉紅色"],["orange","橘色"]
+  ]},
+  { emoji:"🔢", name:"數字 Numbers", pairs:[
+    ["one","一"],["two","二"],["three","三"],["four","四"],["five","五"],
+    ["six","六"],["seven","七"],["eight","八"],["nine","九"],["ten","十"]
+  ]},
+];
+
+/* 內建字庫（來自 decks.js），載入時配上 id */
+const SAMPLE_DECKS = ((window.BUILTIN_DECKS && window.BUILTIN_DECKS.length)
+  ? window.BUILTIN_DECKS : FALLBACK_DECKS
+).map(d => ({ id:id(), emoji:d.emoji, name:d.name, pairs:d.pairs }));
+
+function id(){ return "d"+Math.random().toString(36).slice(2,9); }
+function loadDecks(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){ const d = JSON.parse(raw); if(Array.isArray(d)&&d.length) return d; }
+  }catch(e){}
+  localStorage.setItem(LS_KEY, JSON.stringify(SAMPLE_DECKS));
+  return SAMPLE_DECKS;
+}
+function saveDecks(){ localStorage.setItem(LS_KEY, JSON.stringify(decks)); }
+function loadBest(){ try{ return JSON.parse(localStorage.getItem(LS_BEST))||{}; }catch(e){ return {}; } }
+function saveBest(){ localStorage.setItem(LS_BEST, JSON.stringify(best)); }
+
+let decks = loadDecks();
+let best = loadBest();
+
+/* ================= 共用 UI ================= */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+let toastT;
+function toast(msg, kind=""){
+  const t=$("#toast"); t.textContent=msg; t.className="toast show "+kind;
+  clearTimeout(toastT); toastT=setTimeout(()=>t.className="toast",1800);
+}
+
+/* 分頁切換 */
+$$(".tab").forEach(b=>b.addEventListener("click",()=>{
+  $$(".tab").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  $$(".panel").forEach(p=>p.classList.remove("active"));
+  $("#tab-"+b.dataset.tab).classList.add("active");
+  if(b.dataset.tab==="manage") renderMgr();
+  if(b.dataset.tab==="play") renderDeckList();
+}));
+
+/* ================= 遊戲：設定 ================= */
+let selectedDeckId = decks[0]?.id || null;
+let cfg = { count:6, dir:"both" };
+
+function renderDeckList(){
+  const wrap=$("#deckList"); wrap.innerHTML="";
+  if(!decks.length){ wrap.innerHTML='<div class="empty">還沒有字庫，去「我的字庫」建立一個吧</div>'; updateStartMeta(); return; }
+  if(!decks.find(d=>d.id===selectedDeckId)) selectedDeckId=decks[0].id;
+  decks.forEach(d=>{
+    const el=document.createElement("div");
+    el.className="deck-item"+(d.id===selectedDeckId?" sel":"");
+    el.innerHTML=`<div class="deck-emoji">${d.emoji||"📘"}</div>
+      <div class="deck-meta"><b>${esc(d.name)}</b><span>${d.pairs.length} 組字詞</span></div>`;
+    el.onclick=()=>{ selectedDeckId=d.id; renderDeckList(); };
+    wrap.appendChild(el);
+  });
+  updateStartMeta();
+}
+function updateStartMeta(){
+  const d=decks.find(x=>x.id===selectedDeckId);
+  $("#deckSize").textContent = d? d.pairs.length : 0;
+  const b = d && best[d.id];
+  $("#deckBest").textContent = b? b.toFixed(1)+"s" : "—";
+}
+
+$("#segCount").addEventListener("click",e=>{
+  if(!e.target.dataset.n)return;
+  $$("#segCount button").forEach(x=>x.classList.remove("on"));
+  e.target.classList.add("on"); cfg.count=+e.target.dataset.n;
+});
+$("#segDir").addEventListener("click",e=>{
+  if(!e.target.dataset.d)return;
+  $$("#segDir button").forEach(x=>x.classList.remove("on"));
+  e.target.classList.add("on"); cfg.dir=e.target.dataset.d;
+});
+
+/* ================= 遊戲模式 ================= */
+let players = "solo";   // "solo" | "vs"
+let gtype   = "match";  // "match" | "spell"
+
+const START_TXT = {
+  "solo|match":  { btn:"開始遊戲 ▸",   hint:"配對成功的卡片會消失，全部清空即完成，用最短時間刷新紀錄！" },
+  "vs|match":    { btn:"開始對戰 ⚔️",  hint:"兩位玩家同一份題目、各自一塊盤面，倒數後同時開始，誰先全部配對完成就獲勝！觸控螢幕最好玩。" },
+  "solo|spell":  { btn:"開始拼字 🔤",  hint:"看提示，把打亂的字母依正確順序點出來拼成單字。可選聽寫、填空難度、生存／限時等挑戰規則。" },
+  "vs|spell":    { btn:"開始拼字對戰 ⚔️", hint:"兩位玩家同一批單字、各自拼字，倒數後同時開始，誰先全部拼對就獲勝！可調填空難度。" }
+};
+function refreshStartOpts(){
+  const spell = gtype==="spell";
+  const vs = players==="vs";
+  $("#spellOpts").classList.toggle("opt-hidden", !spell);
+  $("#lineDir").classList.toggle("opt-hidden", spell);       // 配對方向僅配對模式（原本即無實際作用）
+  if(spell){
+    $("#lineClue").classList.toggle("opt-hidden", vs);       // 對戰拼字：固定文字提示
+    $("#lineRule").classList.toggle("opt-hidden", vs);       // 對戰拼字：規則＝競速
+    $("#lineDiff").classList.remove("opt-hidden");
+  }
+  const t=START_TXT[players+"|"+gtype];
+  $("#btnStart").textContent=t.btn;
+  $("#startHint").textContent=t.hint;
+}
+$("#segPlayers").addEventListener("click",e=>{
+  if(!e.target.dataset.p)return;
+  $$("#segPlayers button").forEach(x=>x.classList.remove("on"));
+  e.target.classList.add("on"); players=e.target.dataset.p; refreshStartOpts();
+});
+$("#segType").addEventListener("click",e=>{
+  if(!e.target.dataset.g)return;
+  $$("#segType button").forEach(x=>x.classList.remove("on"));
+  e.target.classList.add("on"); gtype=e.target.dataset.g; refreshStartOpts();
+});
+
+/* ================= 遊戲引擎（可同時跑多盤） ================= */
+function pickChosen(deck){
+  const n=Math.min(cfg.count, deck.pairs.length);
+  return shuffle([...deck.pairs]).slice(0,n);
+}
+function makeCards(chosen){
+  const cards=[];
+  chosen.forEach((p,i)=>{
+    cards.push({pid:i, side:"term", text:p[0]});
+    cards.push({pid:i, side:"def",  text:p[1]});
+  });
+  return shuffle(cards);
+}
+function newBoard(chosen, refs){
+  return { cards:makeCards(chosen), total:chosen.length, remain:chosen.length,
+           miss:0, sel:null, locked:true, done:false, timer:null, startAt:0,
+           finalT:0, refs, onEnd:null };
+}
+function renderInto(g){
+  const b=g.refs.boardEl; b.innerHTML="";
+  g.cards.forEach((c,idx)=>{
+    const el=document.createElement("div");
+    el.className="tile";
+    const tag=c.side==="term"?"字詞":"意思";
+    el.innerHTML=`<span class="side">${tag}</span>${esc(c.text)}`;
+    el.onclick=()=>pickIn(g,idx);
+    c.el=el; c.matched=false;
+    b.appendChild(el);
+  });
+  g.refs.remainEl.textContent=g.remain;
+  g.refs.missEl.textContent=0;
+  g.refs.timeEl.textContent="0.0";
+}
+function startTimer(g){
+  g.locked=false;
+  g.startAt=performance.now();
+  g.timer=setInterval(()=>{
+    g.refs.timeEl.textContent=((performance.now()-g.startAt)/1000).toFixed(1);
+  },100);
+}
+function stopTimer(g){ if(g.timer){ clearInterval(g.timer); g.timer=null; } }
+
+function pickIn(g, idx){
+  if(g.locked||g.done)return;
+  const c=g.cards[idx], el=c.el;
+  if(c.matched)return;
+  if(g.sel===null){ g.sel=idx; el.classList.add("sel"); return; }
+  if(g.sel===idx){ el.classList.remove("sel"); g.sel=null; return; }
+
+  const a=g.cards[g.sel], bC=g.cards[idx];
+  if(a.pid===bC.pid && a.side!==bC.side){
+    a.matched=bC.matched=true;
+    a.el.classList.remove("sel");
+    a.el.classList.add("gone"); bC.el.classList.add("gone");
+    g.sel=null; g.remain--;
+    g.refs.remainEl.textContent=g.remain;
+    if(g.remain===0) endBoard(g);
+  }else{
+    g.locked=true; el.classList.add("sel");
+    a.el.classList.add("wrong"); bC.el.classList.add("wrong");
+    g.miss++; g.refs.missEl.textContent=g.miss;
+    setTimeout(()=>{
+      a.el.classList.remove("sel","wrong");
+      bC.el.classList.remove("sel","wrong");
+      g.sel=null; if(!g.done) g.locked=false;
+    },520);
+  }
+}
+function endBoard(g){
+  g.done=true; stopTimer(g);
+  g.finalT=(performance.now()-g.startAt)/1000;
+  if(g.onEnd) g.onEnd(g);
+}
+
+/* ================= 單人模式 ================= */
+let soloG=null;
+function startSolo(deck){
+  soloG=newBoard(pickChosen(deck), {
+    boardEl:$("#board"), remainEl:$("#remain"), missEl:$("#miss"), timeEl:$("#timeDisp")
+  });
+  soloG.deck=deck;
+  soloG.onEnd=finishSolo;
+  showScreen("game");
+  renderInto(soloG);
+  startTimer(soloG);
+}
+function finishSolo(g){
+  const finalT=g.finalT;
+  const prev=best[g.deck.id];
+  const isBest = prev===undefined || finalT<prev;
+  if(isBest){ best[g.deck.id]=+finalT.toFixed(1); saveBest(); }
+  $("#winTime").textContent=finalT.toFixed(1);
+  $("#winEmoji").textContent = g.miss===0 ? "💎" : (isBest?"🏆":"🎉");
+  $("#winTitle").textContent = g.miss===0 ? "完美！零失誤" : "全部配對完成！";
+  $("#winBest").innerHTML = isBest
+    ? `<span class="best-flag">🎊 刷新最佳紀錄！</span> · 失誤 ${g.miss} 次`
+    : `最佳紀錄 ${prev.toFixed(1)}s · 這次失誤 ${g.miss} 次`;
+  showScreen("win");
+}
+$("#btnQuit").onclick=()=>{ if(soloG) stopTimer(soloG); showScreen("start"); renderDeckList(); };
+$("#btnAgain").onclick=()=>{ startSolo(soloG.deck); };
+$("#btnBackStart").onclick=()=>{ showScreen("start"); renderDeckList(); };
+
+/* ================= 雙人對戰 ================= */
+let vsBoards=[null,null];
+let vsDeck=null;
+let vsEnded=false;
+let cdTimer=null;
+let vsReplay=null;   // 「再戰一場」要重開哪種對戰
+
+function startVs(deck){
+  vsDeck=deck; vsEnded=false; vsReplay=()=>startVs(deck);
+  const chosen=pickChosen(deck);      // 兩邊同一份題目（各自獨立洗牌）
+  vsBoards=[
+    newBoard(chosen, {boardEl:$("#boardP1"),remainEl:$("#remainP1"),missEl:$("#missP1"),timeEl:$("#timeP1")}),
+    newBoard(chosen, {boardEl:$("#boardP2"),remainEl:$("#remainP2"),missEl:$("#missP2"),timeEl:$("#timeP2")})
+  ];
+  vsBoards[0].player=1; vsBoards[1].player=2;
+  vsBoards.forEach(g=>{ g.onEnd=vsBoardDone; renderInto(g); });
+  $("#panelP1").classList.remove("dim","champ");
+  $("#panelP2").classList.remove("dim","champ");
+  showScreen("vs");
+  runCountdown(3, ()=>{ vsBoards.forEach(startTimer); });
+}
+function runCountdown(from, done){
+  const cd=$("#countdown"), num=$("#cdNum");
+  let n=from; cd.classList.add("show"); num.textContent=n;
+  num.style.animation="none"; void num.offsetWidth; num.style.animation="";
+  cdTimer=setInterval(()=>{
+    n--;
+    if(n>0){ num.textContent=n; num.style.animation="none"; void num.offsetWidth; num.style.animation=""; }
+    else if(n===0){ num.textContent="開始!"; num.style.animation="none"; void num.offsetWidth; num.style.animation=""; }
+    else { clearInterval(cdTimer); cdTimer=null; cd.classList.remove("show"); done(); }
+  },1000);
+}
+function vsBoardDone(g){
+  if(vsEnded) return;               // 第一個完成者獲勝
+  vsEnded=true;
+  const winner=g, loser=vsBoards[g.player===1?1:0];
+  loser.done=true; loser.locked=true; stopTimer(loser);
+  $("#panel"+(winner.player===1?"P1":"P2")).classList.add("champ");
+  $("#panel"+(loser.player===1?"P1":"P2")).classList.add("dim");
+  const color = winner.player===1 ? "🔵" : "🔴";
+  $("#vsWinEmoji").textContent = winner.miss===0 ? "💎" : "🏆";
+  $("#vsWinTitle").textContent = `${color} 玩家 ${winner.player} 獲勝！`;
+  $("#vsWinTime").textContent = winner.finalT.toFixed(1);
+  $("#vsWinSub").innerHTML =
+    `勝方失誤 ${winner.miss} 次 · 對手還剩 <b>${loser.remain}</b> 組沒配完`;
+  setTimeout(()=>showScreen("vswin"), 700);
+}
+function quitVs(){
+  if(cdTimer){ clearInterval(cdTimer); cdTimer=null; $("#countdown").classList.remove("show"); }
+  vsEnded=true; vsBoards.forEach(g=>{ if(g){ g.done=true; stopTimer(g); } });
+  showScreen("start"); renderDeckList();
+}
+$("#btnQuitVs").onclick=quitVs;
+$("#btnAgainVs").onclick=()=>{ if(vsReplay) vsReplay(); };
+$("#btnBackStartVs").onclick=()=>{ showScreen("start"); renderDeckList(); };
+
+/* ================= 對戰拼字（兩人同批單字競速拼字） ================= */
+let sbBoards=[null,null];
+let sbEnded=false;
+
+function startVsSpell(deck){
+  sbEnded=false; vsReplay=()=>startVsSpell(deck);
+  const n=Math.min(cfg.count, deck.pairs.length);
+  const words=shuffle([...deck.pairs]).slice(0,n)
+    .map(p=>({term:String(p[0]), clue:String(p[1])}))
+    .filter(w=>[...w.term].some(ch=>!SPELL_SEP.has(ch)));
+  if(!words.length){ toast("這個字庫不適合拼字","bad"); return; }
+  sbBoards=[ makeSB(1,words), makeSB(2,words) ];
+  $("#sbPanelP1").classList.remove("dim","champ");
+  $("#sbPanelP2").classList.remove("dim","champ");
+  showScreen("vspell");
+  sbBoards.forEach(loadSB);
+  runCountdown(3, ()=>{ sbBoards.forEach(sb=>{
+    sb.locked=false; sb.startAt=performance.now();
+    sb.timer=setInterval(()=>{ if(!sb.done) sb.refs.time.textContent=((performance.now()-sb.startAt)/1000).toFixed(1); },100);
+  }); });
+}
+function makeSB(player, words){
+  const P=player===1?"P1":"P2";
+  return { player, P, words, idx:0, done:false, locked:true, startAt:0, timer:null, finalT:0, cur:null,
+    refs:{ clue:$("#sbClue"+P), slots:$("#sbSlots"+P), letters:$("#sbLetters"+P),
+           time:$("#sbTime"+P), idxEl:$("#sbIdx"+P), total:$("#sbTotal"+P) } };
+}
+function loadSB(sb){
+  const w=sb.words[sb.idx];
+  sb.refs.idxEl.textContent=sb.idx+1;
+  sb.refs.total.textContent=sb.words.length;
+  sb.refs.clue.textContent=w.clue;
+  const positions=[...w.term].map(ch=>({ch, sep:SPELL_SEP.has(ch), locked:false, tile:null}));
+  const letterIdx=positions.map((p,i)=>p.sep?-1:i).filter(i=>i>=0);
+  const frac = spellCfg.diff==="easy"?0.5 : spellCfg.diff==="mid"?0.25 : 0;
+  let reveal=Math.min(Math.floor(letterIdx.length*frac), letterIdx.length-1);
+  if(letterIdx.length<=2) reveal=0;
+  const revealSet=new Set(shuffle([...letterIdx]).slice(0,reveal));
+  positions.forEach((p,i)=>{ if(revealSet.has(i)) p.locked=true; });
+  const trayChars=letterIdx.filter(i=>!revealSet.has(i)).map(i=>positions[i].ch);
+  sb.cur={ w, positions, tiles:scrambleLetters(trayChars).map(ch=>({ch,used:false})) };
+  renderSB(sb);
+}
+function renderSB(sb){
+  const cur=sb.cur;
+  const sl=sb.refs.slots; sl.innerHTML=""; sl.className="slots";
+  cur.positions.forEach((p,pi)=>{
+    const d=document.createElement("div");
+    if(p.sep){ d.className="slot sep"; d.textContent=p.ch===" "?"":p.ch; }
+    else if(p.locked){ d.className="slot locked"; d.textContent=p.ch; }
+    else{
+      d.className="slot"+(p.tile!==null?" filled":"");
+      d.textContent=p.tile!==null?cur.tiles[p.tile].ch:"";
+      if(p.tile!==null) d.onclick=()=>removeSB(sb,pi);
+    }
+    sl.appendChild(d);
+  });
+  const lt=sb.refs.letters; lt.innerHTML="";
+  cur.tiles.forEach((t,ti)=>{
+    const b=document.createElement("button");
+    b.className="letter"+(t.used?" used":"");
+    b.textContent=t.ch; b.onclick=()=>placeSB(sb,ti);
+    lt.appendChild(b);
+  });
+}
+function nextSlotSB(sb){ return sb.cur.positions.findIndex(p=>!p.sep && !p.locked && p.tile===null); }
+function placeSB(sb,ti){
+  if(sb.locked||sb.done) return;
+  const t=sb.cur.tiles[ti]; if(t.used) return;
+  const pi=nextSlotSB(sb); if(pi<0) return;
+  sb.cur.positions[pi].tile=ti; t.used=true; renderSB(sb);
+  if(nextSlotSB(sb)<0) checkSB(sb);
+}
+function removeSB(sb,pi){
+  if(sb.locked||sb.done) return;
+  const p=sb.cur.positions[pi]; if(p.sep||p.locked||p.tile===null) return;
+  sb.cur.tiles[p.tile].used=false; p.tile=null; renderSB(sb);
+}
+function backSB(sb){
+  if(sb.locked||sb.done) return;
+  const pos=sb.cur.positions;
+  for(let i=pos.length-1;i>=0;i--){ if(!pos[i].sep && !pos[i].locked && pos[i].tile!==null){ removeSB(sb,i); return; } }
+}
+function clearSB(sb){
+  if(sb.locked||sb.done) return;
+  sb.cur.positions.forEach(p=>{ if(!p.sep && !p.locked && p.tile!==null){ sb.cur.tiles[p.tile].used=false; p.tile=null; } });
+  renderSB(sb);
+}
+function checkSB(sb){
+  const cur=sb.cur;
+  const built=cur.positions.map(p=> p.sep ? p.ch : (p.locked ? p.ch : cur.tiles[p.tile].ch)).join("");
+  const sl=sb.refs.slots;
+  if(built.toLowerCase()===cur.w.term.toLowerCase()){
+    sl.classList.add("good");
+    sb.idx++;
+    if(sb.idx>=sb.words.length) sbDone(sb);
+    else setTimeout(()=>{ if(!sb.done) loadSB(sb); },420);
+  }else{
+    sl.classList.add("bad");
+    setTimeout(()=>{ if(!sb.done) clearSB(sb); },500);
+  }
+}
+function sbStopTimer(sb){ if(sb.timer){ clearInterval(sb.timer); sb.timer=null; } }
+function sbDone(sb){
+  if(sbEnded) return;
+  sbEnded=true;
+  sb.done=true; sb.finalT=(performance.now()-sb.startAt)/1000; sbStopTimer(sb);
+  const loser=sbBoards[sb.player===1?1:0];
+  loser.done=true; loser.locked=true; sbStopTimer(loser);
+  $("#sbPanel"+sb.P).classList.add("champ");
+  $("#sbPanel"+loser.P).classList.add("dim");
+  const color=sb.player===1?"🔵":"🔴";
+  $("#vsWinEmoji").textContent="🏆";
+  $("#vsWinTitle").textContent=`${color} 玩家 ${sb.player} 獲勝！`;
+  $("#vsWinTime").textContent=sb.finalT.toFixed(1);
+  $("#vsWinSub").innerHTML=`拼完 ${sb.words.length} 字 · 對手還剩 <b>${loser.words.length-loser.idx}</b> 字`;
+  setTimeout(()=>showScreen("vswin"),700);
+}
+function quitVsSpell(){
+  if(cdTimer){ clearInterval(cdTimer); cdTimer=null; $("#countdown").classList.remove("show"); }
+  sbEnded=true; sbBoards.forEach(sb=>{ if(sb){ sb.done=true; sbStopTimer(sb); } });
+  showScreen("start"); renderDeckList();
+}
+$("#btnQuitVspell").onclick=quitVsSpell;
+$("#btnSbBackP1").onclick=()=>backSB(sbBoards[0]);
+$("#btnSbClearP1").onclick=()=>clearSB(sbBoards[0]);
+$("#btnSbBackP2").onclick=()=>backSB(sbBoards[1]);
+$("#btnSbClearP2").onclick=()=>clearSB(sbBoards[1]);
+
+/* ================= 拼字模式（聽寫／填空／生存連擊／限時） ================= */
+const SPELL_SEP = new Set([" ","-","'","’","/","."]);
+const SPELL_TIME_LIMIT = 60;   // 限時模式秒數
+let spellCfg = { clue:"text", diff:"hard", rule:"survival" };
+let spellS=null;
+
+function bindSpellSeg(id, key, attr){
+  $("#"+id).addEventListener("click",e=>{
+    const v=e.target.dataset[attr]; if(v===undefined)return;
+    $$("#"+id+" button").forEach(x=>x.classList.remove("on"));
+    e.target.classList.add("on"); spellCfg[key]=v;
+  });
+}
+bindSpellSeg("segClue","clue","c");
+bindSpellSeg("segDiff","diff","f");
+bindSpellSeg("segRule","rule","r");
+
+function speak(text){
+  try{
+    if(!window.speechSynthesis) return false;
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang = /[^\x00-\x7F]/.test(text) ? "zh-TW" : "en-US";
+    u.rate=0.85;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+    return true;
+  }catch(e){ return false; }
+}
+function scrambleLetters(arr){
+  if(arr.length<2) return arr.slice();
+  let s, tries=0;
+  do{ s=shuffle(arr.slice()); tries++; } while(tries<15 && s.join("")===arr.join(""));
+  return s;
+}
+function confetti(){
+  const colors=["#6c5ce7","#00d2ff","#2ecc71","#ffd166","#ff5c7a"];
+  for(let i=0;i<16;i++){
+    const d=document.createElement("div");
+    d.className="confetti-piece";
+    d.style.left=(8+Math.random()*84)+"vw";
+    d.style.background=colors[i%colors.length];
+    d.style.animationDuration=(0.9+Math.random()*0.8)+"s";
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(),1900);
+  }
+}
+function pulseChip(el){ el.classList.remove("pulse"); void el.offsetWidth; el.classList.add("pulse"); }
+
+function startSpell(deck){
+  const n=Math.min(cfg.count, deck.pairs.length);
+  const pool=shuffle([...deck.pairs]).slice(0,n)
+    .map(p=>({term:String(p[0]), clue:String(p[1])}))
+    .filter(w=>[...w.term].some(ch=>!SPELL_SEP.has(ch)));
+  if(!pool.length){ toast("這個字庫不適合拼字","bad"); return; }
+  spellS={ deck, pool, queue:shuffle([...pool]), idx:0, solved:0,
+           miss:0, combo:0, maxCombo:0, score:0, hearts:3,
+           rule:spellCfg.rule, clueMode:spellCfg.clue, diff:spellCfg.diff,
+           startAt:0, timer:null, done:false, cur:null };
+  const survival = spellS.rule==="survival";
+  const timeatk  = spellS.rule==="timeattack";
+  $("#spellHeartsChip").style.display = survival?"":"none";
+  $("#spellTotalWrap").style.display  = timeatk?"none":"";
+  $("#spellTimeUnit").textContent     = timeatk?"秒倒數":"秒";
+  $("#btnReplay").style.display       = spellS.clueMode==="audio"?"":"none";
+  updateSpellHud();
+  showScreen("spell");
+  spellS.startAt=performance.now();
+  spellS.timer=setInterval(tickSpell,100);
+  loadSpellWord();
+}
+function tickSpell(){
+  if(spellS.done) return;
+  if(spellS.rule==="timeattack"){
+    const left=SPELL_TIME_LIMIT-(performance.now()-spellS.startAt)/1000;
+    $("#spellTime").textContent=Math.max(0,left).toFixed(1);
+    if(left<=0) finishSpell("timeup");
+  }else{
+    $("#spellTime").textContent=((performance.now()-spellS.startAt)/1000).toFixed(1);
+  }
+}
+function updateSpellHud(){
+  $("#spellIdx").textContent=spellS.solved+1;
+  if(spellS.rule!=="timeattack") $("#spellTotal").textContent=spellS.pool.length;
+  $("#spellCombo").textContent=spellS.combo;
+  $("#spellScore").textContent=spellS.score;
+  $("#spellMiss").textContent=spellS.miss;
+  $("#spellHeartsChip").textContent="❤️".repeat(spellS.hearts)+"🖤".repeat(Math.max(0,3-spellS.hearts));
+  $("#spellCombo").classList.toggle("hot", spellS.combo>=3);
+}
+function nextWordObj(){
+  if(spellS.idx>=spellS.queue.length){
+    if(spellS.rule==="timeattack"){ spellS.queue=shuffle([...spellS.pool]); spellS.idx=0; }
+    else return null;
+  }
+  return spellS.queue[spellS.idx];
+}
+function loadSpellWord(){
+  const w=nextWordObj();
+  if(!w){ finishSpell("clear"); return; }
+  updateSpellHud();
+  if(spellS.clueMode==="audio"){
+    $("#spellLbl").textContent="🔊 聽發音，拼出單字";
+    $("#spellClue").textContent="🔊 ...";
+    speak(w.term);
+  }else{
+    $("#spellLbl").textContent="拼出這個字";
+    $("#spellClue").textContent=w.clue;
+  }
+  const positions=[...w.term].map(ch=>({ch, sep:SPELL_SEP.has(ch), locked:false, tile:null}));
+  const letterIdx=positions.map((p,i)=>p.sep?-1:i).filter(i=>i>=0);
+  const frac = spellS.diff==="easy"?0.5 : spellS.diff==="mid"?0.25 : 0;
+  let reveal = Math.floor(letterIdx.length*frac);
+  reveal = Math.min(reveal, letterIdx.length-1);      // 至少留 1 個要拼
+  if(letterIdx.length<=2) reveal=0;
+  const revealSet=new Set(shuffle([...letterIdx]).slice(0,reveal));
+  positions.forEach((p,i)=>{ if(revealSet.has(i)) p.locked=true; });
+  const trayChars=letterIdx.filter(i=>!revealSet.has(i)).map(i=>positions[i].ch);
+  spellS.cur={ w, positions, tiles:scrambleLetters(trayChars).map(ch=>({ch,used:false})) };
+  renderSpell();
+}
+function renderSpell(){
+  const cur=spellS.cur;
+  const sl=$("#spellSlots"); sl.innerHTML=""; sl.className="slots";
+  cur.positions.forEach((p,pi)=>{
+    const d=document.createElement("div");
+    if(p.sep){ d.className="slot sep"; d.textContent=p.ch===" "?"":p.ch; }
+    else if(p.locked){ d.className="slot locked"; d.textContent=p.ch; }
+    else{
+      d.className="slot"+(p.tile!==null?" filled":"");
+      d.textContent=p.tile!==null?cur.tiles[p.tile].ch:"";
+      if(p.tile!==null) d.onclick=()=>removeSpellAt(pi);
+    }
+    sl.appendChild(d);
+  });
+  const lt=$("#spellLetters"); lt.innerHTML="";
+  cur.tiles.forEach((t,ti)=>{
+    const b=document.createElement("button");
+    b.className="letter"+(t.used?" used":"");
+    b.textContent=t.ch;
+    b.onclick=()=>placeSpell(ti);
+    lt.appendChild(b);
+  });
+}
+function nextSpellSlot(){ return spellS.cur.positions.findIndex(p=>!p.sep && !p.locked && p.tile===null); }
+function placeSpell(ti){
+  const cur=spellS.cur, t=cur.tiles[ti];
+  if(t.used || spellS.done) return;
+  const pi=nextSpellSlot(); if(pi<0) return;
+  cur.positions[pi].tile=ti; t.used=true;
+  renderSpell();
+  if(nextSpellSlot()<0) checkSpell();
+}
+function removeSpellAt(pi){
+  const p=spellS.cur.positions[pi];
+  if(p.sep||p.locked||p.tile===null) return;
+  spellS.cur.tiles[p.tile].used=false; p.tile=null;
+  renderSpell();
+}
+function backspaceSpell(){
+  if(!spellS||spellS.done) return;
+  const pos=spellS.cur.positions;
+  for(let i=pos.length-1;i>=0;i--){ if(!pos[i].sep && !pos[i].locked && pos[i].tile!==null){ removeSpellAt(i); return; } }
+}
+function clearSpell(){
+  if(!spellS) return;
+  spellS.cur.positions.forEach(p=>{ if(!p.sep && !p.locked && p.tile!==null){ spellS.cur.tiles[p.tile].used=false; p.tile=null; } });
+  renderSpell();
+}
+function checkSpell(){
+  const cur=spellS.cur;
+  const built=cur.positions.map(p=> p.sep ? p.ch : (p.locked ? p.ch : cur.tiles[p.tile].ch)).join("");
+  const sl=$("#spellSlots");
+  if(built.toLowerCase()===cur.w.term.toLowerCase()){
+    sl.classList.add("good");
+    spellS.solved++;
+    spellS.combo++; spellS.maxCombo=Math.max(spellS.maxCombo,spellS.combo);
+    spellS.score += 10 + spellS.combo*2;
+    pulseChip($("#spellScore").parentElement);
+    if(spellS.combo>=3 && spellS.combo%3===0) confetti();
+    updateSpellHud();
+    setTimeout(()=>{ spellS.idx++; loadSpellWord(); },650);
+  }else{
+    sl.classList.add("bad");
+    spellFail();
+    setTimeout(()=>{ if(!spellS.done) clearSpell(); },550);
+  }
+}
+function spellFail(){
+  spellS.miss++; spellS.combo=0;
+  if(spellS.rule==="survival"){
+    spellS.hearts--;
+    if(spellS.hearts<=0){ updateSpellHud(); setTimeout(()=>finishSpell("dead"),520); return; }
+  }
+  updateSpellHud();
+}
+function hintSpell(){
+  if(!spellS||spellS.done) return;
+  const cur=spellS.cur, pi=nextSpellSlot(); if(pi<0) return;
+  const need=cur.w.term[pi].toLowerCase();
+  const ti=cur.tiles.findIndex(t=>!t.used && t.ch.toLowerCase()===need);
+  if(ti<0) return;
+  cur.positions[pi].tile=ti; cur.tiles[ti].used=true;
+  spellS.miss++; spellS.combo=0; updateSpellHud();
+  renderSpell();
+  if(nextSpellSlot()<0) checkSpell();
+}
+function skipSpell(){
+  if(!spellS||spellS.done) return;
+  spellS.miss++; spellS.combo=0;
+  if(spellS.rule==="survival"){
+    spellS.hearts--;
+    if(spellS.hearts<=0){ updateSpellHud(); finishSpell("dead"); return; }
+  }
+  updateSpellHud();
+  spellS.idx++; loadSpellWord();
+}
+function finishSpell(reason){
+  if(spellS.done) return;
+  spellS.done=true;
+  if(spellS.timer) clearInterval(spellS.timer);
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  const t=(performance.now()-spellS.startAt)/1000;
+  let emoji, title;
+  if(reason==="dead"){ emoji="💔"; title="愛心用完了！"; }
+  else if(reason==="timeup"){ emoji="⏱️"; title="時間到！"; }
+  else if(spellS.miss===0){ emoji="💎"; title="完美！全部一次拼對"; }
+  else { emoji="🎉"; title="拼字完成！"; }
+  $("#spellWinEmoji").textContent=emoji;
+  $("#spellWinTitle").textContent=title;
+  $("#spellWinTime").textContent=(spellS.rule==="timeattack"?SPELL_TIME_LIMIT:t).toFixed(1);
+  $("#spellWinSub").innerHTML=`拼對 <b>${spellS.solved}</b> 字 · 得分 <b>${spellS.score}</b> · 最高連擊 <b>${spellS.maxCombo}</b> · 失誤 ${spellS.miss}`;
+  showScreen("spellwin");
+}
+function quitSpell(){
+  if(spellS){ spellS.done=true; if(spellS.timer) clearInterval(spellS.timer); }
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  showScreen("start"); renderDeckList();
+}
+$("#btnQuitSpell").onclick=quitSpell;
+$("#btnSpellBack").onclick=backspaceSpell;
+$("#btnSpellClear").onclick=clearSpell;
+$("#btnSpellHint").onclick=hintSpell;
+$("#btnSpellSkip").onclick=skipSpell;
+$("#btnReplay").onclick=()=>{ if(spellS&&spellS.cur) speak(spellS.cur.w.term); };
+$("#btnAgainSpell").onclick=()=>startSpell(spellS.deck);
+$("#btnBackStartSpell").onclick=()=>{ showScreen("start"); renderDeckList(); };
+
+/* ================= 開始按鈕（依模式分流） ================= */
+$("#btnStart").onclick=()=>{
+  const d=decks.find(x=>x.id===selectedDeckId);
+  if(!d||d.pairs.length<2){ toast("這個字庫至少要 2 組字詞","bad"); return; }
+  if(players==="vs" && gtype==="spell") startVsSpell(d);
+  else if(players==="vs") startVs(d);
+  else if(gtype==="spell") startSpell(d);
+  else startSolo(d);
+};
+
+function showScreen(name){
+  $("#screen-start").style.display    = name==="start"?"block":"none";
+  $("#screen-game").style.display     = name==="game"?"block":"none";
+  $("#screen-win").style.display      = name==="win"?"block":"none";
+  $("#screen-vs").style.display       = name==="vs"?"block":"none";
+  $("#screen-vswin").style.display    = name==="vswin"?"block":"none";
+  $("#screen-spell").style.display    = name==="spell"?"block":"none";
+  $("#screen-spellwin").style.display = name==="spellwin"?"block":"none";
+  $("#screen-vspell").style.display   = name==="vspell"?"block":"none";
+}
+
+/* ================= 字庫管理 ================= */
+let editId = null;   // 正在編輯的字庫 id（null=尚未選）
+let draftPairs = [];
+
+function renderMgr(){
+  const wrap=$("#mgrDeckList"); wrap.innerHTML="";
+  if(!decks.length){ wrap.innerHTML='<div class="empty">還沒有字庫</div>'; }
+  decks.forEach(d=>{
+    const el=document.createElement("div");
+    el.className="deck-item"+(d.id===editId?" sel":"");
+    el.innerHTML=`<div class="deck-emoji">${d.emoji||"📘"}</div>
+      <div class="deck-meta"><b>${esc(d.name)}</b><span>${d.pairs.length} 組</span></div>`;
+    el.onclick=()=>openEditor(d.id);
+    wrap.appendChild(el);
+  });
+}
+
+function openEditor(deckId){
+  const d=decks.find(x=>x.id===deckId);
+  if(!d)return;
+  editId=deckId;
+  $("#edEmoji").value=d.emoji||"📘";
+  $("#edName").value=d.name;
+  draftPairs = d.pairs.map(p=>[p[0],p[1]]);
+  if(!draftPairs.length) draftPairs.push(["",""]);
+  $("#noDeck").style.display="none";
+  $("#editor").style.display="block";
+  renderPairs(); renderMgr();
+}
+
+function renderPairs(){
+  const wrap=$("#pairs"); wrap.innerHTML="";
+  draftPairs.forEach((p,i)=>{
+    const row=document.createElement("div"); row.className="pair-row";
+    row.innerHTML=`
+      <input placeholder="字詞 (如 apple)" value="${esc(p[0])}" data-i="${i}" data-k="0">
+      <input placeholder="意思 (如 蘋果)" value="${esc(p[1])}" data-i="${i}" data-k="1">
+      <button class="btn ghost sm" data-del="${i}" title="刪除">✕</button>`;
+    wrap.appendChild(row);
+  });
+  $("#pairCount").textContent=draftPairs.filter(p=>p[0].trim()||p[1].trim()).length;
+  wrap.querySelectorAll("input").forEach(inp=>{
+    inp.oninput=()=>{ draftPairs[+inp.dataset.i][+inp.dataset.k]=inp.value;
+      $("#pairCount").textContent=draftPairs.filter(p=>p[0].trim()||p[1].trim()).length; };
+  });
+  wrap.querySelectorAll("[data-del]").forEach(btn=>{
+    btn.onclick=()=>{ draftPairs.splice(+btn.dataset.del,1); if(!draftPairs.length)draftPairs.push(["",""]); renderPairs(); };
+  });
+}
+
+$("#btnAddPair").onclick=()=>{ draftPairs.push(["",""]); renderPairs();
+  $("#pairs").lastElementChild.querySelector("input").focus(); };
+
+$("#btnNewDeck").onclick=()=>{
+  const d={id:id(),emoji:"📘",name:"新字庫",pairs:[]};
+  decks.push(d); saveDecks(); openEditor(d.id);
+  $("#edName").focus(); $("#edName").select();
+};
+
+function parseBulk(text){
+  const out=[];
+  text.split(/\r?\n/).forEach(line=>{
+    const l=line.trim(); if(!l)return;
+    let parts=l.split("\t");
+    if(parts.length<2) parts=l.split("=");
+    if(parts.length<2) parts=l.split(/,|，/);
+    if(parts.length>=2){
+      const term=parts[0].trim();
+      const def=parts.slice(1).join(",").trim();
+      if(term&&def) out.push([term,def]);
+    }
+  });
+  return out;
+}
+$("#btnImport").onclick=()=>{
+  const add=parseBulk($("#bulk").value);
+  if(!add.length){ toast("沒有解析到有效配對","bad"); return; }
+  draftPairs=draftPairs.filter(p=>p[0].trim()||p[1].trim()).concat(add);
+  $("#bulk").value=""; renderPairs(); toast(`已加入 ${add.length} 組`,"good");
+};
+$("#btnReplace").onclick=()=>{
+  const add=parseBulk($("#bulk").value);
+  if(!add.length){ toast("沒有解析到有效配對","bad"); return; }
+  draftPairs=add; $("#bulk").value=""; renderPairs(); toast(`已取代為 ${add.length} 組`,"good");
+};
+
+$("#btnSaveDeck").onclick=()=>{
+  const d=decks.find(x=>x.id===editId); if(!d)return;
+  const name=$("#edName").value.trim()||"未命名字庫";
+  const clean=draftPairs.map(p=>[p[0].trim(),p[1].trim()]).filter(p=>p[0]&&p[1]);
+  if(!clean.length){ toast("至少要有一組完整的字詞配對","bad"); return; }
+  d.name=name; d.emoji=$("#edEmoji").value.trim()||"📘"; d.pairs=clean;
+  saveDecks(); renderMgr(); renderPairs();
+  toast("已儲存 ✓","good");
+};
+
+$("#btnDelDeck").onclick=()=>{
+  const d=decks.find(x=>x.id===editId); if(!d)return;
+  if(!confirm(`確定刪除字庫「${d.name}」？此動作無法復原。`))return;
+  decks=decks.filter(x=>x.id!==editId);
+  delete best[editId]; saveBest(); saveDecks();
+  editId=null; $("#editor").style.display="none"; $("#noDeck").style.display="block";
+  renderMgr();
+  if(selectedDeckId && !decks.find(x=>x.id===selectedDeckId)) selectedDeckId=decks[0]?.id||null;
+  toast("已刪除","good");
+};
+
+/* ================= 工具 ================= */
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+/* ================= 動態背景圖示 ================= */
+function initBgDeco(){
+  const host=$("#bgDeco"); if(!host) return;
+  const pool=["📚","✏️","🔤","🎯","⭐","🌟","💡","🎈","🧩","🔠","📖","✨","🎨","📝","🎓","🖍️","🌈","🅰️","🔡","🧠"];
+  const N=22;
+  for(let i=0;i<N;i++){
+    const s=document.createElement("span");
+    s.className="femoji";
+    s.textContent=pool[Math.floor(Math.random()*pool.length)];
+    const sz=26+Math.random()*40;
+    s.style.setProperty("--x", (Math.random()*100).toFixed(2)+"vw");
+    s.style.setProperty("--sz", sz.toFixed(0)+"px");
+    s.style.setProperty("--dur", (20+Math.random()*26).toFixed(1)+"s");
+    s.style.setProperty("--delay", (-Math.random()*30).toFixed(1)+"s");
+    s.style.setProperty("--sway", ((Math.random()*120-60)|0)+"px");
+    s.style.setProperty("--rot", ((Math.random()*120-60)|0)+"deg");
+    s.style.setProperty("--op", (0.14+Math.random()*0.16).toFixed(2));
+    host.appendChild(s);
+  }
+}
+
+/* ================= 啟動 ================= */
+renderDeckList();
+refreshStartOpts();
+initBgDeco();
+</script>
+</body>
+</html>
