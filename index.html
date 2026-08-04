@@ -702,14 +702,14 @@
   </div>
 </dialog>
 
-<script src="decks.js"></script>
+<script src="decks-v4.js"></script>
 <script>
 "use strict";
 /* ================= 資料層 ================= */
-const LS_KEY = "matchgame.decks.v3";
-const LS_BEST = "matchgame.best.v3";
+const LS_KEY = "matchgame.decks.v4";
+const LS_BEST = "matchgame.best.v4";
 
-/* 若 decks.js 未載入，退回內建的基礎字庫 */
+/* 若版本化字庫未載入，退回內建的基礎字庫 */
 const FALLBACK_DECKS = [
   { emoji:"🐶", name:"動物 Animals", pairs:[
     ["dog","狗"],["cat","貓"],["bird","鳥"],["fish","魚"],
@@ -725,7 +725,7 @@ const FALLBACK_DECKS = [
   ]},
 ];
 
-/* 內建字庫（來自 decks.js），載入時配上 id */
+/* 內建字庫載入時配上 id */
 const SAMPLE_DECKS = ((window.BUILTIN_DECKS && window.BUILTIN_DECKS.length)
   ? window.BUILTIN_DECKS : FALLBACK_DECKS
 ).map(d => ({ id:id(), emoji:d.emoji, name:d.name, pairs:d.pairs }));

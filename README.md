@@ -9,6 +9,13 @@
 - iPhone 安全區與 Android 手勢列適配
 - 鍵盤焦點與螢幕閱讀器標示
 
+## 內建字庫
+
+- Week 1、2、3、4、5、7、8、9、10、12、13、14、15、22、23、24
+- Week 字庫共 255 組單字與英文定義
+- L3&L4 動詞三態共 84 組（原形、過去式、過去分詞）
+- 資料來源為教師提供的 2026-1 Word Bank、Definition Bank 與 Verb List
+
 ## 直接開啟
 
 [https://linhercherng.github.io/quizlet-match-mobile-app/](https://linhercherng.github.io/quizlet-match-mobile-app/)
