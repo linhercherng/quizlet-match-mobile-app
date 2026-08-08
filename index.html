@@ -734,7 +734,14 @@ function id(){ return "d"+Math.random().toString(36).slice(2,9); }
 function loadDecks(){
   try{
     const raw = localStorage.getItem(LS_KEY);
-    if(raw){ const d = JSON.parse(raw); if(Array.isArray(d)&&d.length) return d; }
+    if(raw){
+      const d = JSON.parse(raw);
+      if(Array.isArray(d)&&d.length){
+        const migrated = window.prefixL4WeekDecks ? window.prefixL4WeekDecks(d) : d;
+        if(migrated !== d) localStorage.setItem(LS_KEY, JSON.stringify(migrated));
+        return migrated;
+      }
+    }
   }catch(e){}
   localStorage.setItem(LS_KEY, JSON.stringify(SAMPLE_DECKS));
   return SAMPLE_DECKS;

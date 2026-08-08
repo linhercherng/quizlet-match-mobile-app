@@ -33,6 +33,7 @@ test("app shell includes phone installation and safe-area support", async () => 
 test("service worker caches every offline-critical asset", async () => {
   const worker = await read("service-worker.js");
 
+  assert.match(worker, /const CACHE_NAME = "match-master-v4"/);
   for (const asset of [
     "./",
     "./index.html",
