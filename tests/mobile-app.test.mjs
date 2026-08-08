@@ -28,16 +28,17 @@ test("app shell includes phone installation and safe-area support", async () => 
   assert.match(html, /safe-area-inset-bottom/);
   assert.match(html, /grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(html, /matchgame\.decks\.v4/);
+  assert.match(html, /matchgame\.builtin\.v5/);
 });
 
 test("service worker caches every offline-critical asset", async () => {
   const worker = await read("service-worker.js");
 
-  assert.match(worker, /const CACHE_NAME = "match-master-v4"/);
+  assert.match(worker, /const CACHE_NAME = "match-master-v5"/);
   for (const asset of [
     "./",
     "./index.html",
-    "./decks-v4.js",
+    "./decks-v5.js",
     "./manifest.webmanifest",
     "./icons/icon-192.png",
     "./icons/icon-512.png"

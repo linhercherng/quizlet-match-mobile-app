@@ -702,12 +702,13 @@
   </div>
 </dialog>
 
-<script src="decks-v4.js"></script>
+<script src="decks-v5.js"></script>
 <script>
 "use strict";
 /* ================= 資料層 ================= */
 const LS_KEY = "matchgame.decks.v4";
 const LS_BEST = "matchgame.best.v4";
+const LS_BUILTIN = "matchgame.builtin.v5";
 
 /* 若版本化字庫未載入，退回內建的基礎字庫 */
 const FALLBACK_DECKS = [
@@ -737,13 +738,18 @@ function loadDecks(){
     if(raw){
       const d = JSON.parse(raw);
       if(Array.isArray(d)&&d.length){
-        const migrated = window.prefixL4WeekDecks ? window.prefixL4WeekDecks(d) : d;
+        const needsBuiltinUpdate = localStorage.getItem(LS_BUILTIN) !== "ready";
+        const migrated = needsBuiltinUpdate && window.mergeBuiltinDeckUpdates
+          ? window.mergeBuiltinDeckUpdates(d, SAMPLE_DECKS)
+          : (window.prefixL4WeekDecks ? window.prefixL4WeekDecks(d) : d);
         if(migrated !== d) localStorage.setItem(LS_KEY, JSON.stringify(migrated));
+        localStorage.setItem(LS_BUILTIN, "ready");
         return migrated;
       }
     }
   }catch(e){}
   localStorage.setItem(LS_KEY, JSON.stringify(SAMPLE_DECKS));
+  localStorage.setItem(LS_BUILTIN, "ready");
   return SAMPLE_DECKS;
 }
 function saveDecks(){ localStorage.setItem(LS_KEY, JSON.stringify(decks)); }

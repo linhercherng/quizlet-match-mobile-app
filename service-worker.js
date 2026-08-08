@@ -1,10 +1,10 @@
 "use strict";
 
-const CACHE_NAME = "match-master-v4";
+const CACHE_NAME = "match-master-v5";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./decks-v4.js",
+  "./decks-v5.js",
   "./manifest.webmanifest",
   "./icons/icon.svg",
   "./icons/icon-192.png",
