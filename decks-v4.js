@@ -3,7 +3,7 @@
 window.BUILTIN_DECKS = [
   {
     "emoji": "📅",
-    "name": "Week 1",
+    "name": "L4 Week 1",
     "pairs": [
       [
         "beach",
@@ -129,7 +129,7 @@ window.BUILTIN_DECKS = [
   },
   {
     "emoji": "📅",
-    "name": "Week 2",
+    "name": "L4 Week 2",
     "pairs": [
       [
         "balance",
@@ -195,7 +195,7 @@ window.BUILTIN_DECKS = [
   },
   {
     "emoji": "📅",
-    "name": "Week 3",
+    "name": "L4 Week 3",
     "pairs": [
       [
         "blanket",
@@ -261,7 +261,7 @@ window.BUILTIN_DECKS = [
   },
   {
     "emoji": "📅",
-    "name": "Week 4",
+    "name": "L4 Week 4",
     "pairs": [
       [
         "tree house",
@@ -327,7 +327,7 @@ window.BUILTIN_DECKS = [
   },
   {
     "emoji": "📅",
-    "name": "Week 5",
+    "name": "L4 Week 5",
     "pairs": [
       [
         "triangle",
@@ -393,7 +393,7 @@ window.BUILTIN_DECKS = [
   },
   {
     "emoji": "📅",
-    "name": "Week 7",
+    "name": "L4 Week 7",
     "pairs": [
       [
         "exhibition",
@@ -459,7 +459,7 @@ window.BUILTIN_DECKS = [
   },
   {
     "emoji": "📅",
-    "name": "Week 8",
+    "name": "L4 Week 8",
     "pairs": [
       [
         "sandals",
@@ -525,7 +525,7 @@ window.BUILTIN_DECKS = [
   },
   {
     "emoji": "📅",
-    "name": "Week 9",
+    "name": "L4 Week 9",
     "pairs": [
       [
         "compare",
@@ -591,7 +591,7 @@ window.BUILTIN_DECKS = [
   },
   {
     "emoji": "📅",
-    "name": "Week 10",
+    "name": "L4 Week 10",
     "pairs": [
       [
         "material",
@@ -657,7 +657,7 @@ window.BUILTIN_DECKS = [
   },
   {
     "emoji": "📅",
-    "name": "Week 12",
+    "name": "L4 Week 12",
     "pairs": [
       [
         "space",
@@ -723,7 +723,7 @@ window.BUILTIN_DECKS = [
   },
   {
     "emoji": "📅",
-    "name": "Week 13",
+    "name": "L4 Week 13",
     "pairs": [
       [
         "commander",
@@ -789,7 +789,7 @@ window.BUILTIN_DECKS = [
   },
   {
     "emoji": "📅",
-    "name": "Week 14",
+    "name": "L4 Week 14",
     "pairs": [
       [
         "seat",
@@ -855,7 +855,7 @@ window.BUILTIN_DECKS = [
   },
   {
     "emoji": "📅",
-    "name": "Week 15",
+    "name": "L4 Week 15",
     "pairs": [
       [
         "navigator",
@@ -921,7 +921,7 @@ window.BUILTIN_DECKS = [
   },
   {
     "emoji": "📅",
-    "name": "Week 22",
+    "name": "L4 Week 22",
     "pairs": [
       [
         "wise",
@@ -987,7 +987,7 @@ window.BUILTIN_DECKS = [
   },
   {
     "emoji": "📅",
-    "name": "Week 23",
+    "name": "L4 Week 23",
     "pairs": [
       [
         "quality",
@@ -1053,7 +1053,7 @@ window.BUILTIN_DECKS = [
   },
   {
     "emoji": "📅",
-    "name": "Week 24",
+    "name": "L4 Week 24",
     "pairs": [
       [
         "origin",
@@ -1460,3 +1460,13 @@ window.BUILTIN_DECKS = [
     ]
   }
 ];
+
+window.prefixL4WeekDecks = function prefixL4WeekDecks(decks) {
+  let changed = false;
+  const migrated = decks.map((deck) => {
+    if (typeof deck.name !== "string" || !/^Week \d+$/.test(deck.name)) return deck;
+    changed = true;
+    return { ...deck, name: `L4 ${deck.name}` };
+  });
+  return changed ? migrated : decks;
+};

@@ -7,17 +7,36 @@ const source = await readFile(new URL("../decks-v4.js", import.meta.url), "utf8"
 const context = { window: {} };
 vm.runInNewContext(source, context);
 const decks = JSON.parse(JSON.stringify(context.window.BUILTIN_DECKS));
+const prefixL4WeekDecks = context.window.prefixL4WeekDecks;
 
 const expectedWeeks = [1, 2, 3, 4, 5, 7, 8, 9, 10, 12, 13, 14, 15, 22, 23, 24];
 
-test("built-in library contains only Week decks and the verb forms deck", () => {
+test("built-in library prefixes every Week deck with L4", () => {
   assert.equal(decks.length, 17);
   assert.deepEqual(
     decks.slice(0, -1).map((deck) => deck.name),
-    expectedWeeks.map((week) => `Week ${week}`)
+    expectedWeeks.map((week) => `L4 Week ${week}`)
   );
   assert.equal(decks.at(-1).name, "L3&L4 動詞三態");
-  assert.equal(decks.some((deck) => /L1·|L3·W|L4·W/.test(deck.name)), false);
+  assert.equal(decks.slice(0, -1).some((deck) => /^Week /.test(deck.name)), false);
+});
+
+test("existing saved Week deck names are migrated without changing other decks", () => {
+  assert.equal(typeof prefixL4WeekDecks, "function");
+  const savedDecks = [
+    { id: "week-1", name: "Week 1", pairs: [["one", "1"]] },
+    { id: "verbs", name: "L3&L4 動詞三態", pairs: [["be", "been"]] },
+    { id: "custom", name: "自訂字庫", pairs: [["cat", "貓"]] }
+  ];
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(prefixL4WeekDecks(savedDecks))),
+    [
+      { id: "week-1", name: "L4 Week 1", pairs: [["one", "1"]] },
+      savedDecks[1],
+      savedDecks[2]
+    ]
+  );
 });
 
 test("Week decks reproduce all 255 Definition Bank entries", () => {
