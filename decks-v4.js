@@ -1,5 +1,5 @@
-// 2026-1 L4 Week vocabulary and L3&L4 verb forms.
-// Generated from the three teacher-provided PDFs; source PDFs are not published.
+/* Generated from the teacher-provided L3/L4 and L6 Word Bank, Definition Bank, and Verb List PDFs.
+   Source PDFs are intentionally not published with the app. */
 window.BUILTIN_DECKS = [
   {
     "emoji": "📅",
@@ -1458,6 +1458,1588 @@ window.BUILTIN_DECKS = [
         "過去式：wrote｜過去分詞：written"
       ]
     ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 1",
+    "pairs": [
+      [
+        "school schedule",
+        "a plan of when certain classes or events will happen in the school day"
+      ],
+      [
+        "nervous",
+        "having a very anxious or fearful nature."
+      ],
+      [
+        "personality",
+        "the characteristics or traits of a person"
+      ],
+      [
+        "clutch",
+        "to keep in a firm grasp; hold tightly; grip."
+      ],
+      [
+        "confused",
+        "unable to think clearly or to understand something"
+      ],
+      [
+        "exclaim",
+        "to say or shout something suddenly because of surprise, fear, pleasure, etc."
+      ],
+      [
+        "sportswear",
+        "clothes that are worn for sports or other physical activities"
+      ],
+      [
+        "yell",
+        "to shout something or make a loud noise, usually when you are angry, in pain, or excited"
+      ],
+      [
+        "upside down",
+        "having the part that is usually at the top turned to be at the bottom."
+      ],
+      [
+        "catch my eye",
+        "to get my attention"
+      ],
+      [
+        "captain",
+        "the leader of a sports team"
+      ],
+      [
+        "double",
+        "twice the size, amount, price, etc., or consisting of two similar things together"
+      ],
+      [
+        "principal",
+        "the person in charge of a school"
+      ],
+      [
+        "definitely",
+        "without any doubt"
+      ],
+      [
+        "lab (laboratory)",
+        "a room or building with scientific equipment for doing scientific tests"
+      ],
+      [
+        "assembly",
+        "a meeting in a school of several classes, usually at the beginning of the school day"
+      ],
+      [
+        "bell rings",
+        "the school bell rings"
+      ],
+      [
+        "cafeteria",
+        "a restaurant where people collect food and drink"
+      ],
+      [
+        "detention",
+        "a form of punishment in which children are made to stay at school for a short time after classes have ended"
+      ],
+      [
+        "gym (gymnasium)",
+        "a large room with equipment for exercising the body and increasing strength"
+      ],
+      [
+        "hallway",
+        "a narrow passage in a house or building"
+      ],
+      [
+        "locker",
+        "a chest or cabinet that can be locked."
+      ],
+      [
+        "lunch box",
+        "a container used for carrying meals, usually to school or work"
+      ],
+      [
+        "portable classroom",
+        "a classroom that is able to be carried or easily moved."
+      ],
+      [
+        "recess",
+        "a break from an activity, such as between school classes"
+      ],
+      [
+        "stand in line",
+        "to wait behind others"
+      ],
+      [
+        "study hall",
+        "a classroom or other area set aside for studying"
+      ],
+      [
+        "suddenly",
+        "in a way that is very quick and without warning."
+      ],
+      [
+        "exactly",
+        "in a correct or accurate way."
+      ],
+      [
+        "identically",
+        "in a way that is exactly the same, or very similar"
+      ]
+    ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 2",
+    "pairs": [
+      [
+        "headline",
+        "a line of words printed in large letters as the title of a story in a newspaper"
+      ],
+      [
+        "reporter",
+        "a person whose job is to gather and report news for a newspaper or magazine"
+      ],
+      [
+        "article",
+        "a piece of writing on a particular subject that appears in a newspaper, magazine, or book."
+      ],
+      [
+        "online news",
+        "news on a computer or computer network."
+      ],
+      [
+        "identify",
+        "to recognize someone or something and say or prove who or what that person or thing is"
+      ],
+      [
+        "social media",
+        "websites and computer programs that allow people to communicate and share information"
+      ],
+      [
+        "prove",
+        "to show a particular result after a period of time"
+      ],
+      [
+        "reliable",
+        "Someone or something that is reliable can be trusted or believed"
+      ],
+      [
+        "website",
+        "a collection of files accessed through a web address, about a particular theme or subject"
+      ],
+      [
+        "snowstorm",
+        "a storm in which a lot of snow falls. Snowstorms have strong winds."
+      ],
+      [
+        "champion",
+        "a person that has taken first place in a contest or game"
+      ],
+      [
+        "mystery",
+        "something strange or not known that has not yet been explained or understood"
+      ],
+      [
+        "downstairs",
+        "to or on a lower floor of a building, especially the ground floor"
+      ],
+      [
+        "newsreader",
+        "a newscaster"
+      ],
+      [
+        "robbery",
+        "the crime of stealing from somewhere or someone"
+      ]
+    ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 3",
+    "pairs": [
+      [
+        "blog",
+        "a regular written record of your thoughts, opinions, or experiences that you put on the internet for other people to read"
+      ],
+      [
+        "caption",
+        "a short piece of text under a picture in a book, magazine, or newspaper that describes the picture"
+      ],
+      [
+        "cyberbullying",
+        "the activity of using the internet to harm or frighten another person, especially by sending them unpleasant messages"
+      ],
+      [
+        "interview",
+        "a meeting in which someone answers questions about himself or herself for a newspaper article, television show"
+      ],
+      [
+        "supply",
+        "to provide something that is wanted or needed, often in large quantities and over a long period of time an amount of something that is available for use"
+      ],
+      [
+        "describe",
+        "to say or write what someone or something is like"
+      ],
+      [
+        "source",
+        "the place something comes from or the cause of something"
+      ],
+      [
+        "diary",
+        "a book in which you record your thoughts or feelings or what has happened each day"
+      ],
+      [
+        "vlog",
+        "a video blog"
+      ],
+      [
+        "electronic",
+        "(especially of equipment) using, based on, or used in a system of operation that involves the control of electric current by various devices"
+      ],
+      [
+        "precious",
+        "of great value because of being rare, expensive, or important"
+      ],
+      [
+        "deliver",
+        "to take goods, letters, parcels, etc. to people's houses or places of work"
+      ],
+      [
+        "twin",
+        "something that is identical"
+      ],
+      [
+        "available",
+        "able to be bought or used"
+      ],
+      [
+        "after-school club",
+        "the club that happens after school hours"
+      ]
+    ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 4",
+    "pairs": [
+      [
+        "direct",
+        "going in a straight line towards somewhere or someone without stopping"
+      ],
+      [
+        "code",
+        "a system of words, letters, or signs used to represent a message in secret form"
+      ],
+      [
+        "cracker",
+        "one who breaks open, into, or through a secret code"
+      ],
+      [
+        "rescue",
+        "to help someone or something out of a dangerous situation"
+      ],
+      [
+        "stuck",
+        "unable to move, or set in a particular position, place, or way of thinking"
+      ],
+      [
+        "complete",
+        "to make whole or perfect"
+      ],
+      [
+        "service",
+        "the act of dealing with customers in a shop, or selling them goods."
+      ],
+      [
+        "lizard",
+        "a small reptile that has a long body, four short legs, a long tail"
+      ],
+      [
+        "comment(s)",
+        "Something that you say or write that expresses your opinion"
+      ],
+      [
+        "position",
+        "the place where something or someone is, in relation to other things"
+      ],
+      [
+        "burglary",
+        "the crime of illegally entering a building and stealing things."
+      ],
+      [
+        "bookmark",
+        "a strip of paper placed between pages to mark a place in a book."
+      ],
+      [
+        "decide",
+        "to choose something, especially after thinking carefully"
+      ],
+      [
+        "bead",
+        "a very small amount of liquid"
+      ],
+      [
+        "spread",
+        "to cover, reach, or have an effect on a wider or increasing area"
+      ]
+    ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 5",
+    "pairs": [
+      [
+        "centimeter",
+        "a unit of length equal to 0.01 of a meter"
+      ],
+      [
+        "internet",
+        "A network of computers connected across the world."
+      ],
+      [
+        "radio",
+        "A radio uses electric signals to make sound come out of speakers."
+      ],
+      [
+        "thief",
+        "one that steals especially stealthily or secretly."
+      ],
+      [
+        "friendly",
+        "people who are kind, caring, and make you feel comfortable."
+      ],
+      [
+        "rescuer",
+        "a person who rescues you from harm or danger."
+      ],
+      [
+        "terrified",
+        "When you're terrified, you're full of terror and fright"
+      ],
+      [
+        "reported speech",
+        "is speech which tells you what someone said, but does not use the person's actual words"
+      ],
+      [
+        "direct speech",
+        "is a sentence in which the exact words spoken are reproduced in quotation marks"
+      ],
+      [
+        "organize",
+        "to set in order; to arrange in an orderly way."
+      ],
+      [
+        "sharing",
+        "Social media sharing means sharing, posting, or reposting content on social media or other digital platforms."
+      ],
+      [
+        "download",
+        "getting a file or data from one computer to another using the internet, like when you get a game or a picture from a big computer onto your phone or tablet."
+      ],
+      [
+        "upload",
+        "to send data or files from your device, like a computer or tablet, to another place, such as a website or a cloud storage, so others can see it or use it."
+      ],
+      [
+        "podcast",
+        "It's like a radio show that you can listen to anytime you want. It's made up of episodes where people talk about different topics"
+      ],
+      [
+        "details",
+        "the little bits of information that tell you more about something."
+      ]
+    ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 7",
+    "pairs": [
+      [
+        "brave",
+        "showing no fear of dangerous or difficult things"
+      ],
+      [
+        "compassionate",
+        "filled with compassion; and caring for others"
+      ],
+      [
+        "inspirational",
+        "making you feel full of hope or encouraged"
+      ],
+      [
+        "intelligent",
+        "showing intelligence, very smart"
+      ],
+      [
+        "kind",
+        "generous, helpful, and thinking about other people's feelings"
+      ],
+      [
+        "conservationist",
+        "a person who conserves the environment from the damaging"
+      ],
+      [
+        "campaigner",
+        "a person who takes part in organized activities that are intended to change something in society"
+      ],
+      [
+        "notable",
+        "important and deserving attention because of being very good or interesting"
+      ],
+      [
+        "furniture",
+        "the things like chairs and tables in your home"
+      ],
+      [
+        "coincidence",
+        "an occasion when two or more similar things happen at the same time, especially in a way that is unlikely and surprising"
+      ],
+      [
+        "suggest",
+        "to mention an idea, possible plan, or action for other people"
+      ],
+      [
+        "foolish",
+        "unwise, or not showing good judgment"
+      ],
+      [
+        "cure",
+        "to make someone with an illness healthy again"
+      ],
+      [
+        "disease",
+        "illness of people, animals, plants, etc."
+      ],
+      [
+        "characteristic",
+        "a typical or noticeable quality of someone or something"
+      ]
+    ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 8",
+    "pairs": [
+      [
+        "author",
+        "the writer of a book, article, play, etc."
+      ],
+      [
+        "charity worker",
+        "A person who works in a charity to help others."
+      ],
+      [
+        "lawyer",
+        "someone whose job is to give advice to people about the law and speak for them in court"
+      ],
+      [
+        "researcher",
+        "Someone whose job is doing research"
+      ],
+      [
+        "volunteer",
+        "A person who does something helping other people for no money as payment"
+      ],
+      [
+        "determined",
+        "wanting to do something very much and not allowing anyone or any difficulties to stop you"
+      ],
+      [
+        "generous",
+        "willing to give money, help, kindness, etc., especially more than is usual or expected"
+      ],
+      [
+        "politician",
+        "a member of a government"
+      ],
+      [
+        "promote",
+        "to encourage people to like, buy, use, do, or support something"
+      ],
+      [
+        "education",
+        "the process of teaching or learning, especially in a school or college"
+      ],
+      [
+        "value",
+        "the importance or worth or price of something for someone"
+      ],
+      [
+        "feather",
+        "one of the many soft, light things that cover a bird's body"
+      ],
+      [
+        "healthy",
+        "strong and well"
+      ],
+      [
+        "wealthy",
+        "rich"
+      ],
+      [
+        "introduce",
+        "to put something into use, operation, or a place for the first time"
+      ]
+    ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 9",
+    "pairs": [
+      [
+        "orphan",
+        "a child whose parents are dead"
+      ],
+      [
+        "plain",
+        "a large area of flat land"
+      ],
+      [
+        "mascot",
+        "a person, animal, or object that is believed to bring good luck, or one that represents an organization"
+      ],
+      [
+        "paw",
+        "the foot of an animal that has claws or nails, such as a cat, dog, or bear"
+      ],
+      [
+        "campaign",
+        "to organize a series of activities to try to achieve something"
+      ],
+      [
+        "plantation",
+        "a large farm, especially in a hot part of the world, on which a particular type of crop is grown"
+      ],
+      [
+        "discovery",
+        "the process of finding information, a place, or an object, especially for the first time"
+      ],
+      [
+        "amazingly",
+        "in a way that is extremely surprising"
+      ],
+      [
+        "recover",
+        "to become completely well again after an illness or injury"
+      ],
+      [
+        "fame",
+        "the state of being known or recognized by many people because of your achievements, skills"
+      ],
+      [
+        "biography",
+        "the life story of a person written by someone else"
+      ],
+      [
+        "law court",
+        "the place where lawyers and judges work"
+      ],
+      [
+        "description",
+        "something that tells you what something or someone is like"
+      ],
+      [
+        "habitat",
+        "the natural environment in which an animal or plant usually lives"
+      ],
+      [
+        "possession",
+        "something that you own or that you are carrying with you at a particular time"
+      ]
+    ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 10",
+    "pairs": [
+      [
+        "biographical",
+        "about someone's life"
+      ],
+      [
+        "inspire",
+        "to make someone feel that they want to do something and can do it"
+      ],
+      [
+        "furniture store",
+        "the place where furniture is sold"
+      ],
+      [
+        "leash",
+        "a piece of rope or chain tied to an animal"
+      ],
+      [
+        "reserve",
+        "To keep something for particular purpose or time"
+      ],
+      [
+        "ignore",
+        "to not listen or give attention to on purpose"
+      ],
+      [
+        "suitable",
+        "acceptable or right for someone or something"
+      ],
+      [
+        "wildlife reserve",
+        "is a safe park where wild animals live"
+      ],
+      [
+        "laborer",
+        "A laborer is someone who works hard to build or fix things."
+      ],
+      [
+        "universe",
+        "The universe is everything around us, including all the stars, planets, and space."
+      ],
+      [
+        "afternoon tea",
+        "Afternoon tea is a small meal people have in the late afternoon."
+      ],
+      [
+        "accustomed to",
+        "means getting used to something."
+      ],
+      [
+        "achievement",
+        "something very good and difficult that you have succeeded in doing or getting."
+      ],
+      [
+        "climate change",
+        "changes in the world's weather"
+      ],
+      [
+        "dynamite",
+        "explosive"
+      ]
+    ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 12",
+    "pairs": [
+      [
+        "bake cookies",
+        "to cook treats"
+      ],
+      [
+        "design",
+        "to make or draw plans for something, for example clothes or buildings"
+      ],
+      [
+        "do face paintings",
+        "to make designs on someones face"
+      ],
+      [
+        "balloon models",
+        "imitations of real things made with balloons"
+      ],
+      [
+        "sell lemonade",
+        "a drink made with the juice of lemons, water , and sugar"
+      ],
+      [
+        "walk dogs",
+        "to take a dog outside"
+      ],
+      [
+        "brownies",
+        "a small, square chocolate cake"
+      ],
+      [
+        "perform",
+        "to do an action or piece of work"
+      ],
+      [
+        "performance",
+        "the action of entertaining other people by dancing, singing, acting, or playing music"
+      ],
+      [
+        "audience",
+        "the group of people together in one place to watch or listen to a play, film, someone speaking, etc."
+      ],
+      [
+        "musical instruments",
+        "an object, such as a piano, guitar, or drum, that is played to produce musical sounds"
+      ],
+      [
+        "entertain",
+        "to keep a group of people interested or enjoying themselves"
+      ],
+      [
+        "creative",
+        "producing or using original and unusual ideas"
+      ],
+      [
+        "cardboard",
+        "material like very thick, stiff paper, usually pale brown in color, used especially for making boxes"
+      ],
+      [
+        "trumpet",
+        "a brass musical instrument consisting of a metal tube with one narrow end"
+      ]
+    ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 13",
+    "pairs": [
+      [
+        "advertisement (ad)",
+        "a picture, short film, song to promote a product"
+      ],
+      [
+        "cash",
+        "money in coins or notes"
+      ],
+      [
+        "earn",
+        "make money or get something from working"
+      ],
+      [
+        "invent",
+        "to design or create something that is new"
+      ],
+      [
+        "price",
+        "the amount of money for which something is sold"
+      ],
+      [
+        "product",
+        "something that is made to be sold"
+      ],
+      [
+        "save",
+        "to keep something, especially money, for use in the future"
+      ],
+      [
+        "sell",
+        "to give something to someone and get some money back"
+      ],
+      [
+        "spend",
+        "to pay money for something"
+      ],
+      [
+        "bulletin board",
+        "a board on a wall on which posters can be put"
+      ],
+      [
+        "bracelet",
+        "a piece of jewelry that is worn around the wrist or arm"
+      ],
+      [
+        "container",
+        "a box or a bottle that can hold something"
+      ],
+      [
+        "business",
+        "the activity of buying and selling goods"
+      ],
+      [
+        "fund",
+        "to provide the money to pay for an event or activity"
+      ],
+      [
+        "act out",
+        "perform"
+      ]
+    ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 14",
+    "pairs": [
+      [
+        "rubber band",
+        "a thin ring of rubber used for holding things together"
+      ],
+      [
+        "string",
+        "strong, thin rope"
+      ],
+      [
+        "curtain",
+        "A curtain is a piece of cloth that hangs over a window or doorway."
+      ],
+      [
+        "tube",
+        "a long, hollow cylinder of metal, plastic, glass, etc."
+      ],
+      [
+        "float",
+        "to stay on the surface of a liquid"
+      ],
+      [
+        "obligation",
+        "the fact that you have to do"
+      ],
+      [
+        "necessary",
+        "needed; can’t be put aside."
+      ],
+      [
+        "advice",
+        "an opinion that someone tells you"
+      ],
+      [
+        "prize",
+        "something that is given as an award"
+      ],
+      [
+        "figure out",
+        "to think of or understand something"
+      ],
+      [
+        "puzzle",
+        "a game or toy that is hard to be solve"
+      ],
+      [
+        "rhythm",
+        "a strong pattern of sounds, words, or musical notes"
+      ],
+      [
+        "inventor",
+        "People who invent something"
+      ],
+      [
+        "opinion",
+        "what you think ; a thought or belief about something or someone"
+      ],
+      [
+        "punctuation",
+        "special symbols that you add to writing to separate phrases and sentences to show that something is a question, etc."
+      ]
+    ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 15",
+    "pairs": [
+      [
+        "success",
+        "is when something turns out well."
+      ],
+      [
+        "school fair",
+        "is a fun event held at school where there are games, activities, food, and prizes."
+      ],
+      [
+        "experiment",
+        "to try something in order to discover what will happen"
+      ],
+      [
+        "special",
+        "means something or someone that is different in a good way and important."
+      ],
+      [
+        "calculate",
+        "to find out by using calculator or computer"
+      ],
+      [
+        "offer",
+        "to provide or give something to someone"
+      ],
+      [
+        "exclamation mark",
+        "a punctuation mark indicating an exclamation"
+      ],
+      [
+        "persuade",
+        "to make someone do or believe something"
+      ],
+      [
+        "essential",
+        "necessary or needed"
+      ],
+      [
+        "feature",
+        "an important or special part of something"
+      ],
+      [
+        "cameraperson",
+        "a person who films with camera"
+      ],
+      [
+        "narrator",
+        "the character who tells you what is happening in a film or story"
+      ],
+      [
+        "script",
+        "the words of a film, play, broadcast, or speech"
+      ],
+      [
+        "request(s)",
+        "the act of politely or officially asking for something"
+      ],
+      [
+        "respond",
+        "to say or do something as a reaction"
+      ]
+    ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 22",
+    "pairs": [
+      [
+        "carbohydrate",
+        "a nutriet with sugar that provides the body with energy"
+      ],
+      [
+        "protein",
+        "Something that helps your body to be stronger, you can find it in meat, cheese, or eggs."
+      ],
+      [
+        "seaweed",
+        "a green, brown, or dark red plant that grows in the sea or on land very close to the sea"
+      ],
+      [
+        "fiber",
+        "Something that is in food, such as fruit, vegetables, and brown bread that helps digestion."
+      ],
+      [
+        "mineral",
+        "a chemical that your body needs to stay healthy"
+      ],
+      [
+        "jackfruit",
+        "a very large fruit that grows on a tree that is common in South Asia and other tropical areas"
+      ],
+      [
+        "vitamin",
+        "Something necessary for your body to maintain health."
+      ],
+      [
+        "organic",
+        "Growing plants without chemicals or medicines."
+      ],
+      [
+        "greenhouse",
+        "a building with a roof, used for growing plants that need warmth and protection"
+      ],
+      [
+        "colony",
+        "a group of animals, insects, or plants that live together"
+      ],
+      [
+        "agriculture",
+        "farming"
+      ],
+      [
+        "remind",
+        "to make someone think of something"
+      ],
+      [
+        "pollinator",
+        "Something that carries pollen from one plant or part of a plant to another"
+      ],
+      [
+        "nutrient",
+        "something that plants or animals need for living and growing"
+      ],
+      [
+        "sustainable",
+        "to continue for long time"
+      ]
+    ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 23",
+    "pairs": [
+      [
+        "harvest",
+        "the time to collect crops"
+      ],
+      [
+        "pollinate",
+        "to take pollen from one plant or part of a plant to another so that new plant seeds can be produced"
+      ],
+      [
+        "cultivate",
+        "to grow crops"
+      ],
+      [
+        "pesticides",
+        "the medicine which kill harmful insects"
+      ],
+      [
+        "produce",
+        "to make something"
+      ],
+      [
+        "reply",
+        "To answer someone’s question"
+      ],
+      [
+        "infographic",
+        "a picture showing or explaining information"
+      ],
+      [
+        "stripy",
+        "A pattern of stripes"
+      ],
+      [
+        "absolutely",
+        "Completely, totally"
+      ],
+      [
+        "invention",
+        "Something that is made or invented for the first time"
+      ],
+      [
+        "sponge",
+        "a soft yellow material full of small holes used to wash"
+      ],
+      [
+        "gardener",
+        "Someone who works in a garden"
+      ],
+      [
+        "survival",
+        "continuing to alive or exist"
+      ],
+      [
+        "intensify",
+        "to become greater, more serious, or more extreme, or to make something do this"
+      ],
+      [
+        "decision",
+        "a choice that someone makes"
+      ]
+    ]
+  },
+  {
+    "emoji": "📗",
+    "name": "L6 Week 24",
+    "pairs": [
+      [
+        "prediction",
+        "something might happen or is expected to happen"
+      ],
+      [
+        "intention",
+        "something that you want and plan to do"
+      ],
+      [
+        "algae",
+        "Algae are tiny plants that usually grow in water."
+      ],
+      [
+        "probably",
+        "to describe something is likely"
+      ],
+      [
+        "lab-grown",
+        "grown or created in a laboratory"
+      ],
+      [
+        "contribute",
+        "to give for a purpose"
+      ],
+      [
+        "intensive",
+        "involving a lot of effort in a short period of time"
+      ],
+      [
+        "season",
+        "is a period of time during the year with certain weather patterns."
+      ],
+      [
+        "dairy",
+        "refers to products that come from milk, like cheese, yogurt, and butter."
+      ],
+      [
+        "vegetable",
+        "is a type of plant that is grown to be eaten."
+      ],
+      [
+        "omnivore",
+        "an animal that eats both plants and meat"
+      ],
+      [
+        "carnivore",
+        "an animal that eats only meat"
+      ],
+      [
+        "herbivore",
+        "an animal that eats only plants"
+      ],
+      [
+        "vegetarian",
+        "People who don’t eat meat or other animal products"
+      ],
+      [
+        "profitable",
+        "Getting back a profit for making some business"
+      ]
+    ]
+  },
+  {
+    "emoji": "🔄",
+    "name": "L6 動詞三態",
+    "pairs": [
+      [
+        "be",
+        "過去式：was/were｜過去分詞：been"
+      ],
+      [
+        "excuse",
+        "過去式：excused｜過去分詞：excused"
+      ],
+      [
+        "bear",
+        "過去式：bore｜過去分詞：born"
+      ],
+      [
+        "explain",
+        "過去式：explained｜過去分詞：explained"
+      ],
+      [
+        "become",
+        "過去式：became｜過去分詞：become"
+      ],
+      [
+        "explore",
+        "過去式：explored｜過去分詞：explored"
+      ],
+      [
+        "begin",
+        "過去式：began｜過去分詞：begun"
+      ],
+      [
+        "fall",
+        "過去式：fell｜過去分詞：fallen"
+      ],
+      [
+        "believe",
+        "過去式：believed｜過去分詞：believed"
+      ],
+      [
+        "feed",
+        "過去式：fed｜過去分詞：fed"
+      ],
+      [
+        "bite",
+        "過去式：bit｜過去分詞：bitten"
+      ],
+      [
+        "feel",
+        "過去式：felt｜過去分詞：felt"
+      ],
+      [
+        "break",
+        "過去式：broke｜過去分詞：broken"
+      ],
+      [
+        "find",
+        "過去式：found｜過去分詞：found"
+      ],
+      [
+        "bring",
+        "過去式：brought｜過去分詞：brought"
+      ],
+      [
+        "fly",
+        "過去式：flew｜過去分詞：flown"
+      ],
+      [
+        "build",
+        "過去式：built｜過去分詞：built"
+      ],
+      [
+        "forget",
+        "過去式：forgot｜過去分詞：forgotten"
+      ],
+      [
+        "burn",
+        "過去式：burnt｜過去分詞：burnt"
+      ],
+      [
+        "follow",
+        "過去式：followed｜過去分詞：followed"
+      ],
+      [
+        "buy",
+        "過去式：bought｜過去分詞：bought"
+      ],
+      [
+        "get",
+        "過去式：got｜過去分詞：got(ten)"
+      ],
+      [
+        "blow",
+        "過去式：blew｜過去分詞：blown"
+      ],
+      [
+        "give",
+        "過去式：gave｜過去分詞：given"
+      ],
+      [
+        "catch",
+        "過去式：caught｜過去分詞：caught"
+      ],
+      [
+        "go",
+        "過去式：went｜過去分詞：gone"
+      ],
+      [
+        "carry",
+        "過去式：carried｜過去分詞：carried"
+      ],
+      [
+        "grow",
+        "過去式：grew｜過去分詞：grown"
+      ],
+      [
+        "can",
+        "過去式：could｜過去分詞：could"
+      ],
+      [
+        "have",
+        "過去式：had｜過去分詞：had"
+      ],
+      [
+        "come",
+        "過去式：came｜過去分詞：come"
+      ],
+      [
+        "happen",
+        "過去式：happened｜過去分詞：happened"
+      ],
+      [
+        "choose",
+        "過去式：chose｜過去分詞：chosen"
+      ],
+      [
+        "hear",
+        "過去式：heard｜過去分詞：heard"
+      ],
+      [
+        "climb",
+        "過去式：climbed｜過去分詞：climbed"
+      ],
+      [
+        "hide",
+        "過去式：hid｜過去分詞：hidden"
+      ],
+      [
+        "cost",
+        "過去式：cost｜過去分詞：cost"
+      ],
+      [
+        "hit",
+        "過去式：hit｜過去分詞：hit"
+      ],
+      [
+        "complete",
+        "過去式：completed｜過去分詞：completed"
+      ],
+      [
+        "hold",
+        "過去式：held｜過去分詞：held"
+      ],
+      [
+        "contact",
+        "過去式：contacted｜過去分詞：contacted"
+      ],
+      [
+        "hurt",
+        "過去式：hurt｜過去分詞：hurt"
+      ],
+      [
+        "continue",
+        "過去式：continued｜過去分詞：continued"
+      ],
+      [
+        "hurry",
+        "過去式：hurried｜過去分詞：hurried"
+      ],
+      [
+        "cry",
+        "過去式：cried｜過去分詞：cried"
+      ],
+      [
+        "include",
+        "過去式：included｜過去分詞：included"
+      ],
+      [
+        "cut",
+        "過去式：cut｜過去分詞：cut"
+      ],
+      [
+        "improve",
+        "過去式：improved｜過去分詞：improved"
+      ],
+      [
+        "cycle",
+        "過去式：cycled｜過去分詞：cycled"
+      ],
+      [
+        "invite",
+        "過去式：invited｜過去分詞：invited"
+      ],
+      [
+        "do",
+        "過去式：did｜過去分詞：done"
+      ],
+      [
+        "keep",
+        "過去式：kept｜過去分詞：kept"
+      ],
+      [
+        "describe",
+        "過去式：described｜過去分詞：described"
+      ],
+      [
+        "know",
+        "過去式：knew｜過去分詞：known"
+      ],
+      [
+        "decide",
+        "過去式：decided｜過去分詞：decided"
+      ],
+      [
+        "leave",
+        "過去式：left｜過去分詞：left"
+      ],
+      [
+        "delay",
+        "過去式：delayed｜過去分詞：delayed"
+      ],
+      [
+        "learn",
+        "過去式：learned/learnt｜過去分詞：learned/learnt"
+      ],
+      [
+        "download",
+        "過去式：downloaded｜過去分詞：downloaded"
+      ],
+      [
+        "let",
+        "過去式：let｜過去分詞：let"
+      ],
+      [
+        "draw",
+        "過去式：drew｜過去分詞：drawn"
+      ],
+      [
+        "lie",
+        "過去式：lay｜過去分詞：lain"
+      ],
+      [
+        "dream",
+        "過去式：dreamed/dreamt｜過去分詞：dreamed/dreamt"
+      ],
+      [
+        "light",
+        "過去式：lit｜過去分詞：lit"
+      ],
+      [
+        "drink",
+        "過去式：drank｜過去分詞：drunk"
+      ],
+      [
+        "lend",
+        "過去式：lent｜過去分詞：lent"
+      ],
+      [
+        "drive",
+        "過去式：drove｜過去分詞：driven"
+      ],
+      [
+        "lose",
+        "過去式：lost｜過去分詞：lost"
+      ],
+      [
+        "eat",
+        "過去式：ate｜過去分詞：eaten"
+      ],
+      [
+        "make",
+        "過去式：made｜過去分詞：made"
+      ],
+      [
+        "earn",
+        "過去式：earned｜過去分詞：earned"
+      ],
+      [
+        "mean",
+        "過去式：meant｜過去分詞：meant"
+      ],
+      [
+        "enter",
+        "過去式：entered｜過去分詞：entered"
+      ],
+      [
+        "meet",
+        "過去式：met｜過去分詞：met"
+      ],
+      [
+        "offer",
+        "過去式：offered｜過去分詞：offered"
+      ],
+      [
+        "pay",
+        "過去式：paid｜過去分詞：paid"
+      ],
+      [
+        "speak",
+        "過去式：spoke｜過去分詞：spoken"
+      ],
+      [
+        "phone",
+        "過去式：phoned｜過去分詞：phoned"
+      ],
+      [
+        "spend",
+        "過去式：spent｜過去分詞：spent"
+      ],
+      [
+        "put",
+        "過去式：put｜過去分詞：put"
+      ],
+      [
+        "spell",
+        "過去式：spelled｜過去分詞：spelled"
+      ],
+      [
+        "quit",
+        "過去式：quit(ted)｜過去分詞：quit(ted)"
+      ],
+      [
+        "spread",
+        "過去式：spread｜過去分詞：spread"
+      ],
+      [
+        "read",
+        "過去式：read｜過去分詞：read"
+      ],
+      [
+        "suggest",
+        "過去式：suggested｜過去分詞：suggested"
+      ],
+      [
+        "remember",
+        "過去式：remembered｜過去分詞：remembered"
+      ],
+      [
+        "suppose",
+        "過去式：supposed｜過去分詞：supposed"
+      ],
+      [
+        "rent",
+        "過去式：rented｜過去分詞：rented"
+      ],
+      [
+        "stand",
+        "過去式：stood｜過去分詞：stood"
+      ],
+      [
+        "ride",
+        "過去式：rode｜過去分詞：ridden"
+      ],
+      [
+        "steal",
+        "過去式：stole｜過去分詞：stolen"
+      ],
+      [
+        "ring",
+        "過去式：rang｜過去分詞：rung"
+      ],
+      [
+        "swim",
+        "過去式：swam｜過去分詞：swum"
+      ],
+      [
+        "run",
+        "過去式：ran｜過去分詞：run"
+      ],
+      [
+        "take",
+        "過去式：took｜過去分詞：taken"
+      ],
+      [
+        "say",
+        "過去式：said｜過去分詞：said"
+      ],
+      [
+        "teach",
+        "過去式：taught｜過去分詞：taught"
+      ],
+      [
+        "see",
+        "過去式：saw｜過去分詞：seen"
+      ],
+      [
+        "tell",
+        "過去式：told｜過去分詞：told"
+      ],
+      [
+        "sell",
+        "過去式：sold｜過去分詞：sold"
+      ],
+      [
+        "think",
+        "過去式：thought｜過去分詞：thought"
+      ],
+      [
+        "send",
+        "過去式：sent｜過去分詞：sent"
+      ],
+      [
+        "throw",
+        "過去式：threw｜過去分詞：thrown"
+      ],
+      [
+        "shake",
+        "過去式：shook｜過去分詞：shaken"
+      ],
+      [
+        "understand",
+        "過去式：understood｜過去分詞：understood"
+      ],
+      [
+        "shine",
+        "過去式：shone｜過去分詞：shone"
+      ],
+      [
+        "upload",
+        "過去式：uploaded｜過去分詞：uploaded"
+      ],
+      [
+        "shut",
+        "過去式：shut｜過去分詞：shut"
+      ],
+      [
+        "wake",
+        "過去式：woke｜過去分詞：woken"
+      ],
+      [
+        "sing",
+        "過去式：sang｜過去分詞：sung"
+      ],
+      [
+        "wear",
+        "過去式：wore｜過去分詞：worn"
+      ],
+      [
+        "sit",
+        "過去式：sat｜過去分詞：sat"
+      ],
+      [
+        "win",
+        "過去式：won｜過去分詞：won"
+      ],
+      [
+        "sleep",
+        "過去式：slept｜過去分詞：slept"
+      ],
+      [
+        "write",
+        "過去式：wrote｜過去分詞：written"
+      ]
+    ]
   }
 ];
 
@@ -1466,7 +3048,16 @@ window.prefixL4WeekDecks = function prefixL4WeekDecks(decks) {
   const migrated = decks.map((deck) => {
     if (typeof deck.name !== "string" || !/^Week \d+$/.test(deck.name)) return deck;
     changed = true;
-    return { ...deck, name: `L4 ${deck.name}` };
+    return { ...deck, name: "L4 " + deck.name };
   });
   return changed ? migrated : decks;
+};
+
+window.mergeBuiltinDeckUpdates = function mergeBuiltinDeckUpdates(savedDecks, builtinDecks) {
+  const migrated = window.prefixL4WeekDecks(savedDecks);
+  const savedNames = new Set(migrated.map((deck) => deck.name));
+  const missingL6Decks = builtinDecks.filter(
+    (deck) => /^L6 (?:Week \d+|動詞三態)$/.test(deck.name) && !savedNames.has(deck.name)
+  );
+  return missingL6Decks.length ? [...migrated, ...missingL6Decks] : migrated;
 };
