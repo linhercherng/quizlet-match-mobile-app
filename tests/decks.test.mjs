@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import vm from "node:vm";
 
-const source = await readFile(new URL("../decks-v4.js", import.meta.url), "utf8");
+const source = await readFile(new URL("../decks-v5.js", import.meta.url), "utf8");
 const context = { window: {} };
 vm.runInNewContext(source, context);
 const decks = JSON.parse(JSON.stringify(context.window.BUILTIN_DECKS));
