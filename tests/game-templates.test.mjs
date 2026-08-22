@@ -1,0 +1,84 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+import vm from "node:vm";
+
+const source = await readFile(new URL("../game-templates-v1.js", import.meta.url), "utf8");
+const context = { window: {} };
+vm.runInNewContext(source, context);
+const games = context.window.GAME_TEMPLATES;
+
+const pairs = [
+  ["apple", "蘋果"],
+  ["banana", "香蕉"],
+  ["cat", "貓"],
+  ["dog", "狗"],
+  ["elephant", "大象"],
+  ["fish", "魚"]
+];
+
+test("choice questions use the current deck without mutating it", () => {
+  const original = structuredClone(pairs);
+  const questions = games.createChoiceQuestions(pairs, 4, 4, () => 0.25);
+
+  assert.equal(questions.length, 4);
+  for (const question of questions) {
+    assert.ok(pairs.some(([term, definition]) => term === question.answer && definition === question.prompt));
+    assert.equal(question.options.length, 4);
+    assert.equal(new Set(question.options).size, 4);
+    assert.ok(question.options.includes(question.answer));
+  }
+  assert.deepEqual(pairs, original);
+});
+
+test("choice questions reject decks with fewer than four distinct answers", () => {
+  assert.throws(
+    () => games.createChoiceQuestions(pairs.slice(0, 3), 3, 4),
+    /至少需要 4 個不同答案/
+  );
+});
+
+test("maze movement stays in bounds and cannot enter a wall", () => {
+  const walls = new Set(["2,1"]);
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(games.moveMazePlayer({ x: 1, y: 1 }, "right", 7, walls))),
+    { x: 1, y: 1 }
+  );
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(games.moveMazePlayer({ x: 0, y: 0 }, "left", 7, walls))),
+    { x: 0, y: 0 }
+  );
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(games.moveMazePlayer({ x: 1, y: 1 }, "down", 7, walls))),
+    { x: 1, y: 2 }
+  );
+});
+
+test("maze enemy chooses a legal step that approaches the player", () => {
+  const next = games.chooseEnemyStep(
+    { x: 0, y: 0 },
+    { x: 3, y: 3 },
+    7,
+    new Set(["1,0"]),
+    new Set(),
+    () => 0
+  );
+
+  assert.deepEqual(JSON.parse(JSON.stringify(next)), { x: 0, y: 1 });
+});
+
+test("whack wave has one correct mole, distinct holes, and wrong distractors", () => {
+  const question = {
+    prompt: "蘋果",
+    answer: "apple",
+    options: ["apple", "banana", "cat", "dog"]
+  };
+  const wave = games.createWhackWave(question, 9, 3, () => 0.4);
+
+  assert.equal(wave.length, 3);
+  assert.equal(new Set(wave.map((mole) => mole.hole)).size, 3);
+  assert.equal(wave.filter((mole) => mole.correct).length, 1);
+  assert.equal(wave.find((mole) => mole.correct).label, "apple");
+  assert.ok(wave.filter((mole) => !mole.correct).every((mole) => mole.label !== "apple"));
+});
