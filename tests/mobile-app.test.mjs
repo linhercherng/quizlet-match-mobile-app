@@ -51,6 +51,7 @@ test("app shell offers Maze Chase and Whack-a-Mole mobile templates", async () =
   assert.match(html, /data-arcade-diff="easy"/);
   assert.match(html, /data-arcade-diff="normal"/);
   assert.match(html, /data-arcade-diff="hard"/);
+  assert.match(html, /三種難度皆為最大 11×11 迷宮，差別在怪物速度/);
 });
 
 test("arcade templates update smoothly and make correct answers unmistakable", async () => {
@@ -97,7 +98,7 @@ test("maze controls move exactly one cell for each press", async () => {
 test("service worker caches every offline-critical asset", async () => {
   const worker = await read("service-worker.js");
 
-  assert.match(worker, /const CACHE_NAME = "match-master-v12"/);
+  assert.match(worker, /const CACHE_NAME = "match-master-v13"/);
   for (const asset of [
     "./",
     "./index.html",
