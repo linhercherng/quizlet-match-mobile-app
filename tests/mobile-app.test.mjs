@@ -47,10 +47,31 @@ test("app shell offers Maze Chase and Whack-a-Mole mobile templates", async () =
   assert.match(html, /id="whackGrid"/);
 });
 
+test("arcade templates update smoothly and make correct answers unmistakable", async () => {
+  const html = await read("index.html");
+
+  assert.match(html, /function buildMazeBoard\(/);
+  assert.match(html, /function updateMazeActors\(/);
+  assert.match(html, /function buildWhackGrid\(/);
+  assert.match(html, /id="mazeFeedback"[^>]*aria-live="assertive"/);
+  assert.match(html, /id="whackFeedback"[^>]*aria-live="assertive"/);
+  assert.match(html, /function showCorrectFeedback\(/);
+  assert.match(html, /navigator\.vibrate/);
+  assert.match(html, /AudioContext/);
+  assert.match(html, /correctAudioContext\.resume\(\)\.catch/);
+
+  const mazeMove = html.match(/function mazeMove\(direction\)\{[\s\S]*?\n\}/)?.[0] || "";
+  const enemyMove = html.match(/function moveMazeEnemies\(\)\{[\s\S]*?\n\}/)?.[0] || "";
+  assert.match(mazeMove, /updateMazeActors\(\)/);
+  assert.match(enemyMove, /updateMazeActors\(\)/);
+  assert.doesNotMatch(mazeMove, /renderMaze\(/);
+  assert.doesNotMatch(enemyMove, /renderMaze\(/);
+});
+
 test("service worker caches every offline-critical asset", async () => {
   const worker = await read("service-worker.js");
 
-  assert.match(worker, /const CACHE_NAME = "match-master-v6"/);
+  assert.match(worker, /const CACHE_NAME = "match-master-v7"/);
   for (const asset of [
     "./",
     "./index.html",
