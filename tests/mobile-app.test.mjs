@@ -95,10 +95,20 @@ test("maze controls move exactly one cell for each press", async () => {
   assert.match(html, /每按一次移動一格/);
 });
 
+test("Maze Chase starts with five hearts and keeps lost hearts visible", async () => {
+  const html = await read("index.html");
+
+  assert.match(html, /const MAZE_MAX_HEARTS=5/);
+  assert.match(html, /id="mazeHearts">❤️❤️❤️❤️❤️<\/span>/);
+  assert.match(html, /hearts:MAZE_MAX_HEARTS/);
+  assert.match(html, /"🖤"\.repeat\(Math\.max\(0,MAZE_MAX_HEARTS-mazeS\.hearts\)\)/);
+  assert.doesNotMatch(html, /repeat\(3-mazeS\.hearts\)/);
+});
+
 test("service worker caches every offline-critical asset", async () => {
   const worker = await read("service-worker.js");
 
-  assert.match(worker, /const CACHE_NAME = "match-master-v13"/);
+  assert.match(worker, /const CACHE_NAME = "match-master-v14"/);
   for (const asset of [
     "./",
     "./index.html",
