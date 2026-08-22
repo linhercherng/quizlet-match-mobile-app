@@ -986,7 +986,7 @@ const START_TXT = {
   "vs|match":    { btn:"開始對戰 ⚔️",  hint:"兩位玩家同一份題目、各自一塊盤面，倒數後同時開始，誰先全部配對完成就獲勝！觸控螢幕最好玩。" },
   "solo|spell":  { btn:"開始拼字 🔤",  hint:"看提示，把打亂的字母依正確順序點出來拼成單字。可選聽寫、填空難度、生存／限時等挑戰規則。" },
   "vs|spell":    { btn:"開始拼字對戰 ⚔️", hint:"兩位玩家同一批單字、各自拼字，倒數後同時開始，誰先全部拼對就獲勝！可調填空難度。" },
-  "solo|maze":   { btn:"開始迷宮追逐 🧭", hint:"用方向鍵、WASD 或手機方向鈕移動角色，跑進正確答案區，同時避開敵人。" },
+  "solo|maze":   { btn:"開始迷宮追逐 🧭", hint:"每題都會產生不同迷宮。用方向鍵、WASD 或手機方向鈕前往正確答案區，怪物會繞路追蹤你！" },
   "solo|whack":  { btn:"開始打地鼠 🔨", hint:"正確與錯誤答案會自動冒出；只敲符合題目的地鼠，答錯或太慢會失去愛心。" }
 };
 function refreshStartOpts(){
@@ -1580,12 +1580,17 @@ $("#btnBackStartSpell").onclick=()=>{ showScreen("start"); renderDeckList(); };
 /* ================= Maze Chase 迷宮追逐 ================= */
 const ARCADE=window.GAME_TEMPLATES;
 const MAZE_SIZE=7;
-const MAZE_WALLS=new Set(["2,1","4,1","1,2","5,2","2,3","4,3","1,4","5,4","2,5","4,5"]);
 const MAZE_TARGETS=[
   {x:0,y:0,edge:"left-edge top-edge",cells:[{x:0,y:0},{x:1,y:0},{x:0,y:1},{x:1,y:1}]},
   {x:6,y:0,edge:"right-edge top-edge",cells:[{x:5,y:0},{x:6,y:0},{x:5,y:1},{x:6,y:1}]},
   {x:0,y:6,edge:"left-edge bottom-edge",cells:[{x:0,y:5},{x:1,y:5},{x:0,y:6},{x:1,y:6}]},
   {x:6,y:6,edge:"right-edge bottom-edge",cells:[{x:5,y:5},{x:6,y:5},{x:5,y:6},{x:6,y:6}]}
+];
+const MAZE_PLAYER_START={x:3,y:3};
+const MAZE_ENEMY_STARTS=[{x:0,y:3,emoji:"👾"},{x:6,y:3,emoji:"👻"}];
+const MAZE_PROTECTED=[
+  ...MAZE_TARGETS.flatMap(target=>target.cells), MAZE_PLAYER_START,
+  {x:3,y:2},{x:3,y:4}, ...MAZE_ENEMY_STARTS
 ];
 let mazeS=null;
 let whackS=null;
@@ -1627,15 +1632,36 @@ function showCorrectFeedback(selector,points,hostSelector){
   playCorrectSound();
 }
 function resetMazeActors(){
-  mazeS.player={x:3,y:3};
-  mazeS.enemies=[{x:0,y:3,emoji:"👾"},{x:6,y:3,emoji:"👻"}];
+  mazeS.player={...MAZE_PLAYER_START};
+  mazeS.enemies=MAZE_ENEMY_STARTS.map(enemy=>({...enemy}));
+}
+function mazeWallSignature(walls){ return [...walls].sort().join("|"); }
+function createNextMazeWalls(){
+  let walls,signature="";
+  for(let attempt=0;attempt<8;attempt++){
+    walls=ARCADE.createRandomMazeWalls(MAZE_SIZE,10,MAZE_PROTECTED);
+    signature=mazeWallSignature(walls);
+    if(signature!==mazeS.wallSignature) break;
+  }
+  if(signature===mazeS.wallSignature){
+    outer: for(const removeKey of walls){
+      for(let y=0;y<MAZE_SIZE;y++) for(let x=0;x<MAZE_SIZE;x++){
+        const addKey=`${x},${y}`;
+        if(walls.has(addKey)||MAZE_PROTECTED.some(cell=>cell.x===x&&cell.y===y)) continue;
+        const alternative=new Set(walls); alternative.delete(removeKey); alternative.add(addKey);
+        if(ARCADE.isMazeConnected(MAZE_SIZE,alternative)){ walls=alternative; signature=mazeWallSignature(walls); break outer; }
+      }
+    }
+  }
+  mazeS.wallSignature=signature;
+  return walls;
 }
 function startMaze(deck){
   let questions;
   try{ questions=ARCADE.createChoiceQuestions(deck.pairs,cfg.count,4); }
   catch(error){ toast(error.message,"bad"); return; }
   cleanupArcade();
-  mazeS={deck,questions,idx:0,score:0,hearts:3,done:false,locked:false,startAt:performance.now(),enemyTimer:null,clockTimer:null,actionTimer:null,playerEl:null,enemyEls:[],answerEls:[]};
+  mazeS={deck,questions,idx:0,score:0,hearts:3,done:false,locked:false,startAt:performance.now(),enemyTimer:null,clockTimer:null,actionTimer:null,playerEl:null,enemyEls:[],answerEls:[],walls:new Set(),wallSignature:""};
   resetMazeActors();
   arcadeReplay=()=>startMaze(deck);
   $("#mazeTotal").textContent=questions.length;
@@ -1647,12 +1673,12 @@ function startMaze(deck){
 function loadMazeQuestion(){
   if(!mazeS || mazeS.done) return;
   if(mazeS.idx>=mazeS.questions.length){ finishArcade("maze",true); return; }
-  mazeS.locked=false; resetMazeActors();
+  mazeS.locked=false; resetMazeActors(); mazeS.walls=createNextMazeWalls();
   $("#mazePrompt").textContent=mazeS.questions[mazeS.idx].prompt;
   $("#mazeIdx").textContent=mazeS.idx+1;
   $("#mazeScore").textContent=mazeS.score;
   $("#mazeHearts").textContent="❤️".repeat(mazeS.hearts)+"🖤".repeat(3-mazeS.hearts);
-  setArcadeStatus("#mazeStatus","使用方向鍵、WASD 或下方按鈕移動");
+  setArcadeStatus("#mazeStatus","怪物會找最短路徑追你，快找到正確答案！");
   buildMazeBoard();
 }
 function buildMazeBoard(){
@@ -1662,7 +1688,7 @@ function buildMazeBoard(){
   for(let y=0;y<MAZE_SIZE;y++) for(let x=0;x<MAZE_SIZE;x++){
     const cell=document.createElement("div");
     const key=`${x},${y}`;
-    cell.className="maze-cell"+(MAZE_WALLS.has(key)?" wall":"");
+    cell.className="maze-cell"+(mazeS.walls.has(key)?" wall":"");
     const targetIndex=MAZE_TARGETS.findIndex(target=>target.x===x&&target.y===y);
     if(targetIndex>=0){
       cell.classList.add(...MAZE_TARGETS[targetIndex].edge.split(" "));
@@ -1696,7 +1722,7 @@ function updateMazeActors(instant=false){
 }
 function mazeMove(direction){
   if(!mazeS||mazeS.done||mazeS.locked) return;
-  const next=ARCADE.moveMazePlayer(mazeS.player,direction,MAZE_SIZE,MAZE_WALLS);
+  const next=ARCADE.moveMazePlayer(mazeS.player,direction,MAZE_SIZE,mazeS.walls);
   mazeS.player=next;
   if(mazeS.enemies.some(enemy=>samePosition(enemy,next))){ mazeLoseLife("被敵人抓到了！"); return; }
   const targetIndex=ARCADE.findMazeTarget(next,MAZE_TARGETS);
@@ -1705,10 +1731,13 @@ function mazeMove(direction){
 }
 function moveMazeEnemies(){
   if(!mazeS||mazeS.done||mazeS.locked) return;
-  const moved=[];
-  mazeS.enemies=mazeS.enemies.map(enemy=>{
-    const occupied=new Set(moved.map(item=>`${item.x},${item.y}`));
-    const next=ARCADE.chooseEnemyStep(enemy,mazeS.player,MAZE_SIZE,MAZE_WALLS,occupied);
+  const current=mazeS.enemies, moved=[];
+  mazeS.enemies=current.map((enemy,index)=>{
+    const occupied=new Set([
+      ...moved.map(item=>`${item.x},${item.y}`),
+      ...current.slice(index+1).map(item=>`${item.x},${item.y}`)
+    ]);
+    const next=ARCADE.chooseEnemyStep(enemy,mazeS.player,MAZE_SIZE,mazeS.walls,occupied);
     const result={...enemy,...next}; moved.push(result); return result;
   });
   updateMazeActors();

@@ -66,12 +66,14 @@ test("arcade templates update smoothly and make correct answers unmistakable", a
   assert.match(enemyMove, /updateMazeActors\(\)/);
   assert.doesNotMatch(mazeMove, /renderMaze\(/);
   assert.doesNotMatch(enemyMove, /renderMaze\(/);
+  assert.match(html, /createRandomMazeWalls/);
+  assert.match(html, /怪物會找最短路徑追你/);
 });
 
 test("service worker caches every offline-critical asset", async () => {
   const worker = await read("service-worker.js");
 
-  assert.match(worker, /const CACHE_NAME = "match-master-v7"/);
+  assert.match(worker, /const CACHE_NAME = "match-master-v8"/);
   for (const asset of [
     "./",
     "./index.html",
