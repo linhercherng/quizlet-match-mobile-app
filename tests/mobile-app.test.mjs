@@ -31,14 +31,31 @@ test("app shell includes phone installation and safe-area support", async () => 
   assert.match(html, /matchgame\.builtin\.v5/);
 });
 
+test("app shell offers Maze Chase and Whack-a-Mole mobile templates", async () => {
+  const html = await read("index.html");
+
+  assert.match(html, /data-type="maze"/);
+  assert.match(html, /Maze Chase/);
+  assert.match(html, /id="screen-maze"/);
+  assert.match(html, /data-maze-move="up"/);
+  assert.match(html, /data-maze-move="left"/);
+  assert.match(html, /data-maze-move="right"/);
+  assert.match(html, /data-maze-move="down"/);
+  assert.match(html, /data-type="whack"/);
+  assert.match(html, /Whack-a-Mole/);
+  assert.match(html, /id="screen-whack"/);
+  assert.match(html, /id="whackGrid"/);
+});
+
 test("service worker caches every offline-critical asset", async () => {
   const worker = await read("service-worker.js");
 
-  assert.match(worker, /const CACHE_NAME = "match-master-v5"/);
+  assert.match(worker, /const CACHE_NAME = "match-master-v6"/);
   for (const asset of [
     "./",
     "./index.html",
     "./decks-v5.js",
+    "./game-templates-v1.js",
     "./manifest.webmanifest",
     "./icons/icon-192.png",
     "./icons/icon-512.png"
