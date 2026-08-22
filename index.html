@@ -267,7 +267,7 @@
   .arcade-status.good{color:var(--good)}.arcade-status.bad{color:var(--bad)}
 
   .maze-stage{
-    width:min(100%,560px);aspect-ratio:1;margin:0 auto;display:grid;grid-template-columns:repeat(7,1fr);
+    --maze-size:9;width:min(100%,620px);aspect-ratio:1;margin:0 auto;display:grid;grid-template-columns:repeat(var(--maze-size),1fr);
     border:3px solid #5b66aa;border-radius:18px;overflow:hidden;background:#111631;
     box-shadow:inset 0 0 28px rgba(0,0,0,.5);touch-action:none;position:relative;
     contain:layout paint;
@@ -275,17 +275,17 @@
   .maze-cell{position:relative;display:grid;place-items:center;min-width:0;border:1px solid rgba(91,102,170,.13)}
   .maze-cell.wall{background:linear-gradient(135deg,#4d568d,#30385f);box-shadow:inset 0 0 0 2px rgba(255,255,255,.05)}
   .maze-answer{
-    position:absolute;z-index:2;width:calc(200% - 5px);min-height:calc(180% - 5px);padding:5px;
+    position:absolute;z-index:2;width:calc(200% - 5px);min-height:calc(180% - 5px);padding:3px;
     display:grid;place-items:center;text-align:center;border-radius:10px;border:2px solid rgba(255,255,255,.45);
-    color:#fff;font-size:clamp(9px,2.1vw,14px);font-weight:800;line-height:1.1;overflow-wrap:anywhere;
+    color:#fff;font-size:clamp(8px,2.1vw,14px);font-weight:800;line-height:1.1;overflow-wrap:anywhere;
     background:linear-gradient(135deg,rgba(108,92,231,.95),rgba(0,159,190,.9));box-shadow:0 5px 14px rgba(0,0,0,.35)
   }
   .maze-cell.right-edge .maze-answer{right:3px}.maze-cell.left-edge .maze-answer{left:3px}
   .maze-cell.bottom-edge .maze-answer{bottom:3px}.maze-cell.top-edge .maze-answer{top:3px}
   .maze-answer.correct{border-color:#fff;background:linear-gradient(135deg,#2ecc71,#08a96b);animation:answerGlow .5s ease-out}
   .maze-actor{
-    position:absolute;top:0;left:0;z-index:5;width:calc(100% / 7);height:calc(100% / 7);
-    display:grid;place-items:center;font-size:clamp(22px,6vw,38px);line-height:1;pointer-events:none;
+    position:absolute;top:0;left:0;z-index:5;width:calc(100% / var(--maze-size));height:calc(100% / var(--maze-size));
+    display:grid;place-items:center;font-size:clamp(17px,calc(270px / var(--maze-size)),38px);line-height:1;pointer-events:none;
     transform:translate3d(calc(var(--maze-x) * 100%),calc(var(--maze-y) * 100%),0);
     transition:transform 145ms cubic-bezier(.2,.8,.3,1);will-change:transform;
   }
@@ -536,6 +536,14 @@
               <button data-n="6" class="on">6</button>
               <button data-n="8">8</button>
               <button data-n="10">10</button>
+            </div>
+          </div>
+          <div class="opt-line opt-hidden" id="arcadeOpts">
+            <span>遊戲難易度</span>
+            <div class="seg" id="segArcadeDiff">
+              <button data-arcade-diff="easy">簡單</button>
+              <button data-arcade-diff="normal" class="on">普通</button>
+              <button data-arcade-diff="hard">困難</button>
             </div>
           </div>
           <div class="opt-line" id="lineDir">
@@ -939,7 +947,7 @@ $$(".tab").forEach(b=>b.addEventListener("click",()=>{
 
 /* ================= 遊戲：設定 ================= */
 let selectedDeckId = decks[0]?.id || null;
-let cfg = { count:6, dir:"both" };
+let cfg = { count:6, dir:"both", arcadeDifficulty:"normal" };
 
 function renderDeckList(){
   const wrap=$("#deckList"); wrap.innerHTML="";
@@ -976,6 +984,12 @@ $("#segDir").addEventListener("click",e=>{
   $$("#segDir button").forEach(x=>x.classList.remove("on"));
   e.target.classList.add("on"); cfg.dir=e.target.dataset.d;
 });
+$("#segArcadeDiff").addEventListener("click",e=>{
+  if(!e.target.dataset.arcadeDiff)return;
+  $$("#segArcadeDiff button").forEach(x=>x.classList.remove("on"));
+  e.target.classList.add("on"); cfg.arcadeDifficulty=e.target.dataset.arcadeDiff;
+  refreshStartOpts();
+});
 
 /* ================= 遊戲模式 ================= */
 let players = "solo";   // "solo" | "vs"
@@ -997,6 +1011,7 @@ function refreshStartOpts(){
   vsButton.disabled=arcade;
   vsButton.title=arcade?"此模板目前為單人遊戲":"";
   $("#spellOpts").classList.toggle("opt-hidden", !spell);
+  $("#arcadeOpts").classList.toggle("opt-hidden", !arcade);
   $("#lineDir").classList.toggle("opt-hidden", gtype!=="match");
   if(spell){
     $("#lineClue").classList.toggle("opt-hidden", vs);       // 對戰拼字：固定文字提示
@@ -1004,8 +1019,12 @@ function refreshStartOpts(){
     $("#lineDiff").classList.remove("opt-hidden");
   }
   const t=START_TXT[players+"|"+gtype];
+  const difficulty=arcade?ARCADE.getArcadeDifficulty(cfg.arcadeDifficulty):null;
   $("#btnStart").textContent=t.btn;
-  $("#startHint").textContent=t.hint;
+  const detail=gtype==="maze"
+    ? `${difficulty.label}：${difficulty.mazeSize}×${difficulty.mazeSize} 迷宮，怪物每 ${(difficulty.enemyMoveMs/1000).toFixed(2)} 秒移動。`
+    : gtype==="whack" ? `${difficulty.label}：地鼠停留 ${(difficulty.whackStayMs/1000).toFixed(1)} 秒。` : "";
+  $("#startHint").textContent=t.hint+(detail?` ${detail}`:"");
   updateStartMeta();
 }
 $("#segPlayers").addEventListener("click",e=>{
@@ -1579,19 +1598,6 @@ $("#btnBackStartSpell").onclick=()=>{ showScreen("start"); renderDeckList(); };
 
 /* ================= Maze Chase 迷宮追逐 ================= */
 const ARCADE=window.GAME_TEMPLATES;
-const MAZE_SIZE=7;
-const MAZE_TARGETS=[
-  {x:0,y:0,edge:"left-edge top-edge",cells:[{x:0,y:0},{x:1,y:0},{x:0,y:1},{x:1,y:1}]},
-  {x:6,y:0,edge:"right-edge top-edge",cells:[{x:5,y:0},{x:6,y:0},{x:5,y:1},{x:6,y:1}]},
-  {x:0,y:6,edge:"left-edge bottom-edge",cells:[{x:0,y:5},{x:1,y:5},{x:0,y:6},{x:1,y:6}]},
-  {x:6,y:6,edge:"right-edge bottom-edge",cells:[{x:5,y:5},{x:6,y:5},{x:5,y:6},{x:6,y:6}]}
-];
-const MAZE_PLAYER_START={x:3,y:3};
-const MAZE_ENEMY_STARTS=[{x:0,y:3,emoji:"👾"},{x:6,y:3,emoji:"👻"}];
-const MAZE_PROTECTED=[
-  ...MAZE_TARGETS.flatMap(target=>target.cells), MAZE_PLAYER_START,
-  {x:3,y:2},{x:3,y:4}, ...MAZE_ENEMY_STARTS
-];
 let mazeS=null;
 let whackS=null;
 let arcadeReplay=null;
@@ -1632,24 +1638,24 @@ function showCorrectFeedback(selector,points,hostSelector){
   playCorrectSound();
 }
 function resetMazeActors(){
-  mazeS.player={...MAZE_PLAYER_START};
-  mazeS.enemies=MAZE_ENEMY_STARTS.map(enemy=>({...enemy}));
+  mazeS.player={...mazeS.geometry.playerStart};
+  mazeS.enemies=mazeS.geometry.enemyStarts.map(enemy=>({...enemy}));
 }
 function mazeWallSignature(walls){ return [...walls].sort().join("|"); }
 function createNextMazeWalls(){
   let walls,signature="";
   for(let attempt=0;attempt<8;attempt++){
-    walls=ARCADE.createRandomMazeWalls(MAZE_SIZE,10,MAZE_PROTECTED);
+    walls=ARCADE.createRandomMazeWalls(mazeS.size,mazeS.difficulty.mazeWallCount,mazeS.geometry.protectedPositions);
     signature=mazeWallSignature(walls);
     if(signature!==mazeS.wallSignature) break;
   }
   if(signature===mazeS.wallSignature){
     outer: for(const removeKey of walls){
-      for(let y=0;y<MAZE_SIZE;y++) for(let x=0;x<MAZE_SIZE;x++){
+      for(let y=0;y<mazeS.size;y++) for(let x=0;x<mazeS.size;x++){
         const addKey=`${x},${y}`;
-        if(walls.has(addKey)||MAZE_PROTECTED.some(cell=>cell.x===x&&cell.y===y)) continue;
+        if(walls.has(addKey)||mazeS.geometry.protectedPositions.some(cell=>cell.x===x&&cell.y===y)) continue;
         const alternative=new Set(walls); alternative.delete(removeKey); alternative.add(addKey);
-        if(ARCADE.isMazeConnected(MAZE_SIZE,alternative)){ walls=alternative; signature=mazeWallSignature(walls); break outer; }
+        if(ARCADE.isMazeConnected(mazeS.size,alternative)){ walls=alternative; signature=mazeWallSignature(walls); break outer; }
       }
     }
   }
@@ -1661,14 +1667,15 @@ function startMaze(deck){
   try{ questions=ARCADE.createChoiceQuestions(deck.pairs,cfg.count,4); }
   catch(error){ toast(error.message,"bad"); return; }
   cleanupArcade();
-  mazeS={deck,questions,idx:0,score:0,hearts:3,done:false,locked:false,startAt:performance.now(),enemyTimer:null,clockTimer:null,actionTimer:null,playerEl:null,enemyEls:[],answerEls:[],walls:new Set(),wallSignature:""};
+  const difficulty=ARCADE.getArcadeDifficulty(cfg.arcadeDifficulty);
+  mazeS={deck,questions,difficulty,size:difficulty.mazeSize,geometry:ARCADE.createMazeGeometry(difficulty.mazeSize),idx:0,score:0,hearts:3,done:false,locked:false,startAt:performance.now(),enemyTimer:null,clockTimer:null,actionTimer:null,playerEl:null,enemyEls:[],answerEls:[],walls:new Set(),wallSignature:""};
   resetMazeActors();
   arcadeReplay=()=>startMaze(deck);
   $("#mazeTotal").textContent=questions.length;
   showScreen("maze");
   loadMazeQuestion();
   mazeS.clockTimer=setInterval(()=>{ if(!mazeS.done) $("#mazeTime").textContent=((performance.now()-mazeS.startAt)/1000).toFixed(1); },200);
-  mazeS.enemyTimer=setInterval(moveMazeEnemies,680);
+  mazeS.enemyTimer=setInterval(moveMazeEnemies,difficulty.enemyMoveMs);
 }
 function loadMazeQuestion(){
   if(!mazeS || mazeS.done) return;
@@ -1678,20 +1685,21 @@ function loadMazeQuestion(){
   $("#mazeIdx").textContent=mazeS.idx+1;
   $("#mazeScore").textContent=mazeS.score;
   $("#mazeHearts").textContent="❤️".repeat(mazeS.hearts)+"🖤".repeat(3-mazeS.hearts);
-  setArcadeStatus("#mazeStatus","怪物會找最短路徑追你，快找到正確答案！");
+  setArcadeStatus("#mazeStatus",`${mazeS.difficulty.label} ${mazeS.size}×${mazeS.size}｜怪物會找最短路徑追你！`);
   buildMazeBoard();
 }
 function buildMazeBoard(){
   const stage=$("#mazeStage"), fragment=document.createDocumentFragment();
   const question=mazeS.questions[mazeS.idx];
+  stage.style.setProperty("--maze-size",mazeS.size);
   mazeS.answerEls=[];
-  for(let y=0;y<MAZE_SIZE;y++) for(let x=0;x<MAZE_SIZE;x++){
+  for(let y=0;y<mazeS.size;y++) for(let x=0;x<mazeS.size;x++){
     const cell=document.createElement("div");
     const key=`${x},${y}`;
     cell.className="maze-cell"+(mazeS.walls.has(key)?" wall":"");
-    const targetIndex=MAZE_TARGETS.findIndex(target=>target.x===x&&target.y===y);
+    const targetIndex=mazeS.geometry.targets.findIndex(target=>target.x===x&&target.y===y);
     if(targetIndex>=0){
-      cell.classList.add(...MAZE_TARGETS[targetIndex].edge.split(" "));
+      cell.classList.add(...mazeS.geometry.targets[targetIndex].edge.split(" "));
       const answer=document.createElement("div"); answer.className="maze-answer";
       answer.textContent=question.options[targetIndex];
       answer.setAttribute("aria-label",`答案區：${question.options[targetIndex]}`);
@@ -1722,10 +1730,10 @@ function updateMazeActors(instant=false){
 }
 function mazeMove(direction){
   if(!mazeS||mazeS.done||mazeS.locked) return;
-  const next=ARCADE.moveMazePlayer(mazeS.player,direction,MAZE_SIZE,mazeS.walls);
+  const next=ARCADE.moveMazePlayer(mazeS.player,direction,mazeS.size,mazeS.walls);
   mazeS.player=next;
   if(mazeS.enemies.some(enemy=>samePosition(enemy,next))){ mazeLoseLife("被敵人抓到了！"); return; }
-  const targetIndex=ARCADE.findMazeTarget(next,MAZE_TARGETS);
+  const targetIndex=ARCADE.findMazeTarget(next,mazeS.geometry.targets);
   if(targetIndex>=0){ resolveMazeAnswer(targetIndex); return; }
   updateMazeActors();
 }
@@ -1737,7 +1745,7 @@ function moveMazeEnemies(){
       ...moved.map(item=>`${item.x},${item.y}`),
       ...current.slice(index+1).map(item=>`${item.x},${item.y}`)
     ]);
-    const next=ARCADE.chooseEnemyStep(enemy,mazeS.player,MAZE_SIZE,mazeS.walls,occupied);
+    const next=ARCADE.chooseEnemyStep(enemy,mazeS.player,mazeS.size,mazeS.walls,occupied);
     const result={...enemy,...next}; moved.push(result); return result;
   });
   updateMazeActors();
@@ -1780,7 +1788,8 @@ function startWhack(deck){
   try{ questions=ARCADE.createChoiceQuestions(deck.pairs,cfg.count,4); }
   catch(error){ toast(error.message,"bad"); return; }
   cleanupArcade();
-  whackS={deck,questions,idx:0,score:0,hearts:5,done:false,locked:false,startAt:performance.now(),clockTimer:null,waveTimer:null,actionTimer:null,waveStartedAt:0,wave:[],holes:[]};
+  const difficulty=ARCADE.getArcadeDifficulty(cfg.arcadeDifficulty);
+  whackS={deck,questions,difficulty,idx:0,score:0,hearts:5,done:false,locked:false,startAt:performance.now(),clockTimer:null,waveTimer:null,actionTimer:null,waveStartedAt:0,wave:[],holes:[]};
   arcadeReplay=()=>startWhack(deck);
   $("#whackTotal").textContent=questions.length;
   showScreen("whack");
@@ -1794,7 +1803,7 @@ function loadWhackQuestion(){
   $("#whackPrompt").textContent=whackS.questions[whackS.idx].prompt;
   $("#whackIdx").textContent=whackS.idx+1;
   updateWhackHud();
-  setArcadeStatus("#whackStatus","只敲符合題目的地鼠");
+  setArcadeStatus("#whackStatus",`${whackS.difficulty.label}｜地鼠停留 ${(whackS.difficulty.whackStayMs/1000).toFixed(1)} 秒`);
   showWhackWave();
 }
 function updateWhackHud(){
@@ -1806,7 +1815,7 @@ function showWhackWave(){
   clearTimeout(whackS.waveTimer); whackS.locked=false;
   whackS.wave=ARCADE.createWhackWave(whackS.questions[whackS.idx],9,3);
   whackS.waveStartedAt=performance.now(); renderWhack();
-  whackS.waveTimer=setTimeout(()=>whackMistake("太慢了！正確地鼠跑掉了"),2200);
+  whackS.waveTimer=setTimeout(()=>whackMistake("太慢了！正確地鼠跑掉了"),whackS.difficulty.whackStayMs);
 }
 function buildWhackGrid(){
   const grid=$("#whackGrid"),fragment=document.createDocumentFragment();
@@ -1838,7 +1847,7 @@ function hitMole(mole,button){
   whackS.locked=true; clearTimeout(whackS.waveTimer);
   if(mole.correct){
     const reaction=performance.now()-whackS.waveStartedAt;
-    const earned=100+Math.max(0,Math.round((2200-reaction)/25));
+    const earned=100+Math.max(0,Math.round(100*(1-reaction/whackS.difficulty.whackStayMs)));
     whackS.score+=earned;
     whackS.idx++; updateWhackHud();
     button.classList.add("correct");
