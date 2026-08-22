@@ -734,7 +734,7 @@
           <div class="row">
             <button class="btn ghost sm" id="btnQuitMaze">✕ 結束</button>
             <span class="chip">題目 <b id="mazeIdx">1</b>/<b id="mazeTotal">0</b></span>
-            <span class="chip" id="mazeHearts">❤️❤️❤️</span>
+            <span class="chip" id="mazeHearts">❤️❤️❤️❤️❤️</span>
             <span class="chip">分數 <b id="mazeScore">0</b></span>
           </div>
           <div class="timer"><span id="mazeTime">0.0</span><small>秒</small></div>
@@ -1600,12 +1600,16 @@ $("#btnBackStartSpell").onclick=()=>{ showScreen("start"); renderDeckList(); };
 
 /* ================= Maze Chase 迷宮追逐 ================= */
 const ARCADE=window.GAME_TEMPLATES;
+const MAZE_MAX_HEARTS=5;
 let mazeS=null;
 let whackS=null;
 let arcadeReplay=null;
 
 function setArcadeStatus(selector,message,kind=""){
   const status=$(selector); status.textContent=message; status.className="arcade-status "+kind;
+}
+function updateMazeHearts(){
+  $("#mazeHearts").textContent="❤️".repeat(Math.max(0,mazeS.hearts))+"🖤".repeat(Math.max(0,MAZE_MAX_HEARTS-mazeS.hearts));
 }
 function samePosition(a,b){ return a.x===b.x && a.y===b.y; }
 let correctAudioContext=null;
@@ -1676,7 +1680,7 @@ function startMaze(deck){
   catch(error){ toast(error.message,"bad"); return; }
   cleanupArcade();
   const difficulty=ARCADE.getArcadeDifficulty(cfg.arcadeDifficulty);
-  mazeS={deck,questions,difficulty,size:difficulty.mazeSize,geometry:ARCADE.createMazeGeometry(difficulty.mazeSize),idx:0,score:0,hearts:3,done:false,locked:false,startAt:performance.now(),enemyTimer:null,clockTimer:null,actionTimer:null,playerEl:null,enemyEls:[],answerEls:[],walls:new Set(),wallSignature:""};
+  mazeS={deck,questions,difficulty,size:difficulty.mazeSize,geometry:ARCADE.createMazeGeometry(difficulty.mazeSize),idx:0,score:0,hearts:MAZE_MAX_HEARTS,done:false,locked:false,startAt:performance.now(),enemyTimer:null,clockTimer:null,actionTimer:null,playerEl:null,enemyEls:[],answerEls:[],walls:new Set(),wallSignature:""};
   resetMazeActors();
   arcadeReplay=()=>startMaze(deck);
   $("#mazeTotal").textContent=questions.length;
@@ -1692,7 +1696,7 @@ function loadMazeQuestion(){
   $("#mazePrompt").textContent=mazeS.questions[mazeS.idx].prompt;
   $("#mazeIdx").textContent=mazeS.idx+1;
   $("#mazeScore").textContent=mazeS.score;
-  $("#mazeHearts").textContent="❤️".repeat(mazeS.hearts)+"🖤".repeat(3-mazeS.hearts);
+  updateMazeHearts();
   setArcadeStatus("#mazeStatus",`${mazeS.difficulty.label} ${mazeS.size}×${mazeS.size}｜每按一次移動一格`);
   buildMazeBoard();
   focusMazeStage();
@@ -1780,7 +1784,7 @@ function mazeLoseLife(message){
   if(!mazeS||mazeS.done) return;
   mazeS.locked=true; mazeS.hearts--;
   updateMazeActors();
-  $("#mazeHearts").textContent="❤️".repeat(Math.max(0,mazeS.hearts))+"🖤".repeat(Math.max(0,3-mazeS.hearts));
+  updateMazeHearts();
   setArcadeStatus("#mazeStatus",message,"bad");
   if(mazeS.hearts<=0) mazeS.actionTimer=setTimeout(()=>finishArcade("maze",false),400);
   else mazeS.actionTimer=setTimeout(()=>{ resetMazeActors(); mazeS.locked=false; updateMazeActors(true); setArcadeStatus("#mazeStatus","重新出發，避開敵人！"); },440);
