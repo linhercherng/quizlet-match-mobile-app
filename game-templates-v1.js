@@ -44,8 +44,8 @@
   }
 
   const ARCADE_DIFFICULTIES = Object.freeze({
-    easy: Object.freeze({ key: "easy", label: "簡單", mazeSize: 7, mazeWallCount: 10, playerMoveMs: 135, enemyMoveMs: 900, whackStayMs: 3000 }),
-    normal: Object.freeze({ key: "normal", label: "普通", mazeSize: 9, mazeWallCount: 20, playerMoveMs: 115, enemyMoveMs: 680, whackStayMs: 2200 }),
+    easy: Object.freeze({ key: "easy", label: "簡單", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 900, whackStayMs: 3000 }),
+    normal: Object.freeze({ key: "normal", label: "普通", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 680, whackStayMs: 2200 }),
     hard: Object.freeze({ key: "hard", label: "困難", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 460, whackStayMs: 1400 })
   });
 

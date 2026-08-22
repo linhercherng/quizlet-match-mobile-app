@@ -38,20 +38,29 @@ test("choice questions reject decks with fewer than four distinct answers", () =
   );
 });
 
-test("arcade difficulty changes maze size, monster speed, and mole stay time", () => {
+test("arcade difficulty keeps the largest maze and changes monster speed and mole stay time", () => {
   assert.deepEqual(
     JSON.parse(JSON.stringify(games.getArcadeDifficulty("easy"))),
-    { key: "easy", label: "簡單", mazeSize: 7, mazeWallCount: 10, playerMoveMs: 135, enemyMoveMs: 900, whackStayMs: 3000 }
+    { key: "easy", label: "簡單", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 900, whackStayMs: 3000 }
   );
   assert.deepEqual(
     JSON.parse(JSON.stringify(games.getArcadeDifficulty("normal"))),
-    { key: "normal", label: "普通", mazeSize: 9, mazeWallCount: 20, playerMoveMs: 115, enemyMoveMs: 680, whackStayMs: 2200 }
+    { key: "normal", label: "普通", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 680, whackStayMs: 2200 }
   );
   assert.deepEqual(
     JSON.parse(JSON.stringify(games.getArcadeDifficulty("hard"))),
     { key: "hard", label: "困難", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 460, whackStayMs: 1400 }
   );
   assert.equal(games.getArcadeDifficulty("unknown").key, "normal");
+});
+
+test("maze difficulty changes only the monster movement speed", () => {
+  const difficulties = ["easy", "normal", "hard"].map(games.getArcadeDifficulty);
+
+  assert.deepEqual(difficulties.map(({ mazeSize }) => mazeSize), [11, 11, 11]);
+  assert.deepEqual(difficulties.map(({ mazeWallCount }) => mazeWallCount), [32, 32, 32]);
+  assert.deepEqual(difficulties.map(({ playerMoveMs }) => playerMoveMs), [95, 95, 95]);
+  assert.deepEqual(difficulties.map(({ enemyMoveMs }) => enemyMoveMs), [900, 680, 460]);
 });
 
 test("the player moves at least four times faster than monsters at every difficulty", () => {

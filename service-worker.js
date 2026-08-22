@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_NAME = "match-master-v12";
+const CACHE_NAME = "match-master-v13";
 const APP_SHELL = [
   "./",
   "./index.html",
