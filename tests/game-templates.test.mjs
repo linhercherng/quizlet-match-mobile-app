@@ -68,6 +68,56 @@ test("maze enemy chooses a legal step that approaches the player", () => {
   assert.deepEqual(JSON.parse(JSON.stringify(next)), { x: 0, y: 1 });
 });
 
+test("maze enemy follows the shortest route around a wall instead of oscillating", () => {
+  const wallColumn = new Set(["2,0", "2,1", "2,2", "2,3"]);
+  const next = games.chooseEnemyStep(
+    { x: 1, y: 2 },
+    { x: 3, y: 2 },
+    5,
+    wallColumn,
+    new Set(),
+    () => 0
+  );
+
+  assert.deepEqual(JSON.parse(JSON.stringify(next)), { x: 1, y: 3 });
+});
+
+test("random maze walls vary while preserving protected cells and connectivity", () => {
+  const protectedCells = [
+    { x: 3, y: 3 }, { x: 0, y: 3 }, { x: 6, y: 3 },
+    { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 },
+    { x: 5, y: 0 }, { x: 6, y: 0 }, { x: 5, y: 1 }, { x: 6, y: 1 },
+    { x: 0, y: 5 }, { x: 1, y: 5 }, { x: 0, y: 6 }, { x: 1, y: 6 },
+    { x: 5, y: 5 }, { x: 6, y: 5 }, { x: 5, y: 6 }, { x: 6, y: 6 }
+  ];
+  const seededRandom = (seed) => () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+  const first = games.createRandomMazeWalls(7, 10, protectedCells, seededRandom(11));
+  const second = games.createRandomMazeWalls(7, 10, protectedCells, seededRandom(29));
+
+  assert.equal(first.size, 10);
+  assert.equal(second.size, 10);
+  assert.notDeepEqual([...first].sort(), [...second].sort());
+  assert.ok(protectedCells.every(({ x, y }) => !first.has(`${x},${y}`)));
+  assert.equal(games.isMazeConnected(7, first), true);
+  assert.equal(games.isMazeConnected(7, second), true);
+});
+
+test("a monster can reach a stationary player in a generated maze", () => {
+  const player = { x: 3, y: 3 };
+  const protectedCells = [player, { x: 0, y: 3 }, { x: 6, y: 3 }];
+  const walls = games.createRandomMazeWalls(7, 10, protectedCells, () => 0.37);
+  let enemy = { x: 0, y: 3 };
+
+  for (let turn = 0; turn < 20 && (enemy.x !== player.x || enemy.y !== player.y); turn += 1) {
+    enemy = games.chooseEnemyStep(enemy, player, 7, walls, new Set(), () => 0);
+  }
+
+  assert.deepEqual(JSON.parse(JSON.stringify(enemy)), player);
+});
+
 test("every visibly covered maze cell activates its answer zone", () => {
   const targets = [
     { cells: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }] },

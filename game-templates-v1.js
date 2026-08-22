@@ -67,15 +67,66 @@
   }
 
   function chooseEnemyStep(enemy, player, size, walls, occupied = new Set(), random = Math.random) {
-    const candidates = Object.values(DIRECTIONS)
-      .map((delta) => ({ x: enemy.x + delta.x, y: enemy.y + delta.y }))
-      .filter((position) => legalPosition(position, size, walls, occupied));
-    if (!candidates.length) return { ...enemy };
+    if (enemy.x === player.x && enemy.y === player.y) return { ...enemy };
+    const directions = shuffleCopy(Object.values(DIRECTIONS), random);
+    const queue = [{ position: { ...enemy }, firstStep: null }];
+    const visited = new Set([positionKey(enemy)]);
 
-    const distance = (position) => Math.abs(position.x - player.x) + Math.abs(position.y - player.y);
-    const nearestDistance = Math.min(...candidates.map(distance));
-    const nearest = candidates.filter((position) => distance(position) === nearestDistance);
-    return { ...nearest[Math.floor(random() * nearest.length)] };
+    while (queue.length) {
+      const current = queue.shift();
+      for (const delta of directions) {
+        const next = { x: current.position.x + delta.x, y: current.position.y + delta.y };
+        const key = positionKey(next);
+        if (visited.has(key) || !legalPosition(next, size, walls, occupied)) continue;
+        const firstStep = current.firstStep || next;
+        if (next.x === player.x && next.y === player.y) return { ...firstStep };
+        visited.add(key);
+        queue.push({ position: next, firstStep });
+      }
+    }
+    return { ...enemy };
+  }
+
+  function isMazeConnected(size, walls) {
+    let start = null;
+    for (let y = 0; y < size && !start; y += 1) {
+      for (let x = 0; x < size; x += 1) {
+        if (!walls.has(`${x},${y}`)) { start = { x, y }; break; }
+      }
+    }
+    if (!start) return false;
+
+    const queue = [start];
+    const visited = new Set([positionKey(start)]);
+    while (queue.length) {
+      const current = queue.shift();
+      for (const delta of Object.values(DIRECTIONS)) {
+        const next = { x: current.x + delta.x, y: current.y + delta.y };
+        const key = positionKey(next);
+        if (visited.has(key) || !legalPosition(next, size, walls)) continue;
+        visited.add(key); queue.push(next);
+      }
+    }
+    return visited.size === size * size - walls.size;
+  }
+
+  function createRandomMazeWalls(size, wallCount, protectedPositions = [], random = Math.random) {
+    const protectedKeys = new Set(protectedPositions.map(positionKey));
+    const candidates = [];
+    for (let y = 0; y < size; y += 1) {
+      for (let x = 0; x < size; x += 1) {
+        const key = `${x},${y}`;
+        if (!protectedKeys.has(key)) candidates.push(key);
+      }
+    }
+
+    const walls = new Set();
+    for (const key of shuffleCopy(candidates, random)) {
+      if (walls.size >= wallCount) break;
+      const trial = new Set(walls); trial.add(key);
+      if (isMazeConnected(size, trial)) walls.add(key);
+    }
+    return walls;
   }
 
   function findMazeTarget(position, targets) {
@@ -112,6 +163,8 @@
     createChoiceQuestions,
     moveMazePlayer,
     chooseEnemyStep,
+    isMazeConnected,
+    createRandomMazeWalls,
     findMazeTarget,
     createWhackWave
   });
