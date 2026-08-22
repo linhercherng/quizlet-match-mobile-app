@@ -1601,7 +1601,7 @@ function playCorrectSound(){
     const AudioContextClass=window.AudioContext||window.webkitAudioContext;
     if(!AudioContextClass) return;
     if(!correctAudioContext) correctAudioContext=new AudioContextClass();
-    if(correctAudioContext.state==="suspended") correctAudioContext.resume();
+    if(correctAudioContext.state==="suspended") correctAudioContext.resume().catch(()=>{});
     const now=correctAudioContext.currentTime;
     [659,880].forEach((frequency,index)=>{
       const oscillator=correctAudioContext.createOscillator();

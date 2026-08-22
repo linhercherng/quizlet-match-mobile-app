@@ -58,6 +58,7 @@ test("arcade templates update smoothly and make correct answers unmistakable", a
   assert.match(html, /function showCorrectFeedback\(/);
   assert.match(html, /navigator\.vibrate/);
   assert.match(html, /AudioContext/);
+  assert.match(html, /correctAudioContext\.resume\(\)\.catch/);
 
   const mazeMove = html.match(/function mazeMove\(direction\)\{[\s\S]*?\n\}/)?.[0] || "";
   const enemyMove = html.match(/function moveMazeEnemies\(\)\{[\s\S]*?\n\}/)?.[0] || "";
