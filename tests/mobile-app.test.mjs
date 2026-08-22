@@ -79,12 +79,20 @@ test("arcade templates update smoothly and make correct answers unmistakable", a
   assert.match(html, /whackS\.difficulty\.whackStayMs/);
   assert.match(html, /function focusMazeStage\(/);
   assert.match(html, /ARCADE\.mazeDirectionFromKeyboardEvent\(event\)/);
+  assert.match(html, /function startMazeMovement\(/);
+  assert.match(html, /function stopMazeMovement\(/);
+  assert.match(html, /difficulty\.playerMoveMs/);
+  assert.match(html, /"pointerdown"/);
+  assert.match(html, /"pointerup"/);
+  assert.match(html, /"pointercancel"/);
+  assert.match(html, /document\.addEventListener\("keyup"/);
+  assert.match(html, /window\.addEventListener\("blur",\(\)=>stopMazeMovement\(\)\)/);
 });
 
 test("service worker caches every offline-critical asset", async () => {
   const worker = await read("service-worker.js");
 
-  assert.match(worker, /const CACHE_NAME = "match-master-v10"/);
+  assert.match(worker, /const CACHE_NAME = "match-master-v11"/);
   for (const asset of [
     "./",
     "./index.html",

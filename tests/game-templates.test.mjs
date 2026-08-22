@@ -41,17 +41,24 @@ test("choice questions reject decks with fewer than four distinct answers", () =
 test("arcade difficulty changes maze size, monster speed, and mole stay time", () => {
   assert.deepEqual(
     JSON.parse(JSON.stringify(games.getArcadeDifficulty("easy"))),
-    { key: "easy", label: "簡單", mazeSize: 7, mazeWallCount: 10, enemyMoveMs: 900, whackStayMs: 3000 }
+    { key: "easy", label: "簡單", mazeSize: 7, mazeWallCount: 10, playerMoveMs: 135, enemyMoveMs: 900, whackStayMs: 3000 }
   );
   assert.deepEqual(
     JSON.parse(JSON.stringify(games.getArcadeDifficulty("normal"))),
-    { key: "normal", label: "普通", mazeSize: 9, mazeWallCount: 20, enemyMoveMs: 680, whackStayMs: 2200 }
+    { key: "normal", label: "普通", mazeSize: 9, mazeWallCount: 20, playerMoveMs: 115, enemyMoveMs: 680, whackStayMs: 2200 }
   );
   assert.deepEqual(
     JSON.parse(JSON.stringify(games.getArcadeDifficulty("hard"))),
-    { key: "hard", label: "困難", mazeSize: 11, mazeWallCount: 32, enemyMoveMs: 460, whackStayMs: 1400 }
+    { key: "hard", label: "困難", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 460, whackStayMs: 1400 }
   );
   assert.equal(games.getArcadeDifficulty("unknown").key, "normal");
+});
+
+test("the player moves at least four times faster than monsters at every difficulty", () => {
+  for (const key of ["easy", "normal", "hard"]) {
+    const difficulty = games.getArcadeDifficulty(key);
+    assert.ok(difficulty.playerMoveMs * 4 <= difficulty.enemyMoveMs, key);
+  }
 });
 
 test("maze geometry expands answer zones and starts for larger odd boards", () => {

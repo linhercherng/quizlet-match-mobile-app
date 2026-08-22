@@ -291,13 +291,14 @@
     transition:transform 145ms cubic-bezier(.2,.8,.3,1);will-change:transform;
   }
   .maze-actor>span{filter:drop-shadow(0 4px 3px rgba(0,0,0,.45))}
+  .maze-player{transition-duration:var(--player-transition-ms,85ms)}
   .maze-player>span{animation:mazeBounce .65s ease-in-out infinite alternate}
   .maze-enemy>span{animation:enemyPulse .6s ease-in-out infinite alternate}
   .maze-actor.instant{transition:none}
   @keyframes mazeBounce{to{transform:translateY(-4px)}}
   @keyframes enemyPulse{to{transform:scale(1.12)}}
   .maze-controls{width:min(260px,100%);margin:12px auto 0;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-  .maze-controls button{min-height:50px;padding:8px;font-size:22px}
+  .maze-controls button{min-height:50px;padding:8px;font-size:22px;touch-action:none;user-select:none;-webkit-user-select:none}
   .maze-controls .up{grid-column:2}.maze-controls .left{grid-column:1}.maze-controls .down{grid-column:2}.maze-controls .right{grid-column:3}
 
   .whack-grid{width:min(100%,620px);margin:8px auto 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;contain:layout paint}
@@ -1001,7 +1002,7 @@ const START_TXT = {
   "vs|match":    { btn:"開始對戰 ⚔️",  hint:"兩位玩家同一份題目、各自一塊盤面，倒數後同時開始，誰先全部配對完成就獲勝！觸控螢幕最好玩。" },
   "solo|spell":  { btn:"開始拼字 🔤",  hint:"看提示，把打亂的字母依正確順序點出來拼成單字。可選聽寫、填空難度、生存／限時等挑戰規則。" },
   "vs|spell":    { btn:"開始拼字對戰 ⚔️", hint:"兩位玩家同一批單字、各自拼字，倒數後同時開始，誰先全部拼對就獲勝！可調填空難度。" },
-  "solo|maze":   { btn:"開始迷宮追逐 🧭", hint:"每題都會產生不同迷宮。用方向鍵、WASD 或手機方向鈕前往正確答案區，怪物會繞路追蹤你！" },
+  "solo|maze":   { btn:"開始迷宮追逐 🧭", hint:"每題都會產生不同迷宮，怪物會找最短路徑追你。按住方向鍵、WASD 或手機方向鈕可快速連續移動，前往正確答案區並避開怪物！" },
   "solo|whack":  { btn:"開始打地鼠 🔨", hint:"正確與錯誤答案會自動冒出；只敲符合題目的地鼠，答錯或太慢會失去愛心。" }
 };
 function refreshStartOpts(){
@@ -1602,6 +1603,8 @@ const ARCADE=window.GAME_TEMPLATES;
 let mazeS=null;
 let whackS=null;
 let arcadeReplay=null;
+let mazeMovementTimer=null;
+let mazeMovementDirection=null;
 
 function setArcadeStatus(selector,message,kind=""){
   const status=$(selector); status.textContent=message; status.className="arcade-status "+kind;
@@ -1649,6 +1652,22 @@ function focusMazeStage(){
   try{ stage.focus({preventScroll:true}); }
   catch(error){ stage.focus(); }
 }
+function stopMazeMovement(direction=""){
+  if(direction&&mazeMovementDirection!==direction)return;
+  clearInterval(mazeMovementTimer);
+  mazeMovementTimer=null; mazeMovementDirection=null;
+}
+function startMazeMovement(direction){
+  if(!mazeS||mazeS.done||mazeS.locked)return;
+  if(mazeMovementTimer&&mazeMovementDirection===direction)return;
+  stopMazeMovement(); mazeMovementDirection=direction;
+  mazeMove(direction);
+  if(!mazeS||mazeS.done||mazeS.locked||mazeMovementDirection!==direction)return;
+  mazeMovementTimer=setInterval(()=>{
+    if(!mazeS||mazeS.done||mazeS.locked){ stopMazeMovement(); return; }
+    mazeMove(direction);
+  },mazeS.difficulty.playerMoveMs);
+}
 function createNextMazeWalls(){
   let walls,signature="";
   for(let attempt=0;attempt<8;attempt++){
@@ -1687,12 +1706,12 @@ function startMaze(deck){
 function loadMazeQuestion(){
   if(!mazeS || mazeS.done) return;
   if(mazeS.idx>=mazeS.questions.length){ finishArcade("maze",true); return; }
-  mazeS.locked=false; resetMazeActors(); mazeS.walls=createNextMazeWalls();
+  stopMazeMovement(); mazeS.locked=false; resetMazeActors(); mazeS.walls=createNextMazeWalls();
   $("#mazePrompt").textContent=mazeS.questions[mazeS.idx].prompt;
   $("#mazeIdx").textContent=mazeS.idx+1;
   $("#mazeScore").textContent=mazeS.score;
   $("#mazeHearts").textContent="❤️".repeat(mazeS.hearts)+"🖤".repeat(3-mazeS.hearts);
-  setArcadeStatus("#mazeStatus",`${mazeS.difficulty.label} ${mazeS.size}×${mazeS.size}｜怪物會找最短路徑追你！`);
+  setArcadeStatus("#mazeStatus",`${mazeS.difficulty.label} ${mazeS.size}×${mazeS.size}｜按住方向可快速移動！`);
   buildMazeBoard();
   focusMazeStage();
 }
@@ -1700,6 +1719,7 @@ function buildMazeBoard(){
   const stage=$("#mazeStage"), fragment=document.createDocumentFragment();
   const question=mazeS.questions[mazeS.idx];
   stage.style.setProperty("--maze-size",mazeS.size);
+  stage.style.setProperty("--player-transition-ms",`${Math.max(65,Math.round(mazeS.difficulty.playerMoveMs*.72))}ms`);
   mazeS.answerEls=[];
   for(let y=0;y<mazeS.size;y++) for(let x=0;x<mazeS.size;x++){
     const cell=document.createElement("div");
@@ -1760,7 +1780,7 @@ function moveMazeEnemies(){
   if(mazeS.enemies.some(enemy=>samePosition(enemy,mazeS.player))){ mazeLoseLife("被敵人抓到了！"); return; }
 }
 function resolveMazeAnswer(targetIndex){
-  mazeS.locked=true;
+  stopMazeMovement(); mazeS.locked=true;
   const question=mazeS.questions[mazeS.idx];
   if(question.options[targetIndex]===question.answer){
     const earned=100+mazeS.hearts*10;
@@ -1776,19 +1796,37 @@ function resolveMazeAnswer(targetIndex){
 }
 function mazeLoseLife(message){
   if(!mazeS||mazeS.done) return;
-  mazeS.locked=true; mazeS.hearts--;
+  stopMazeMovement(); mazeS.locked=true; mazeS.hearts--;
   updateMazeActors();
   $("#mazeHearts").textContent="❤️".repeat(Math.max(0,mazeS.hearts))+"🖤".repeat(Math.max(0,3-mazeS.hearts));
   setArcadeStatus("#mazeStatus",message,"bad");
   if(mazeS.hearts<=0) mazeS.actionTimer=setTimeout(()=>finishArcade("maze",false),400);
   else mazeS.actionTimer=setTimeout(()=>{ resetMazeActors(); mazeS.locked=false; updateMazeActors(true); setArcadeStatus("#mazeStatus","重新出發，避開敵人！"); },440);
 }
-$$('[data-maze-move]').forEach(button=>button.addEventListener("click",()=>mazeMove(button.dataset.mazeMove)));
+$$('[data-maze-move]').forEach(button=>{
+  const direction=button.dataset.mazeMove;
+  button.addEventListener("pointerdown",event=>{
+    event.preventDefault();
+    try{ button.setPointerCapture(event.pointerId); }catch(error){}
+    startMazeMovement(direction);
+  });
+  ["pointerup","pointercancel","pointerleave","lostpointercapture"].forEach(type=>
+    button.addEventListener(type,()=>stopMazeMovement(direction))
+  );
+  button.addEventListener("click",event=>{ if(event.detail===0) mazeMove(direction); });
+});
 document.addEventListener("keydown",event=>{
   if(!mazeS||mazeS.done||$("#screen-maze").style.display==="none") return;
   const direction=ARCADE.mazeDirectionFromKeyboardEvent(event);
-  if(direction){ event.preventDefault(); mazeMove(direction); }
+  if(direction){ event.preventDefault(); startMazeMovement(direction); }
 },true);
+document.addEventListener("keyup",event=>{
+  if(!mazeMovementTimer&&!mazeMovementDirection)return;
+  const direction=ARCADE.mazeDirectionFromKeyboardEvent(event);
+  if(direction){ event.preventDefault(); stopMazeMovement(direction); }
+},true);
+window.addEventListener("blur",()=>stopMazeMovement());
+document.addEventListener("visibilitychange",()=>{ if(document.hidden)stopMazeMovement(); });
 
 /* ================= Whack-a-Mole 打地鼠 ================= */
 function startWhack(deck){
@@ -1874,6 +1912,7 @@ function whackMistake(message){
 }
 
 function cleanupArcade(){
+  stopMazeMovement();
   if(mazeS){ mazeS.done=true; clearInterval(mazeS.enemyTimer); clearInterval(mazeS.clockTimer); clearTimeout(mazeS.actionTimer); }
   if(whackS){ whackS.done=true; clearInterval(whackS.clockTimer); clearTimeout(whackS.waveTimer); clearTimeout(whackS.actionTimer); }
 }
@@ -1881,7 +1920,7 @@ function finishArcade(type,cleared){
   const state=type==="maze"?mazeS:whackS;
   if(!state||state.done) return;
   const elapsed=(performance.now()-state.startAt)/1000;
-  if(type==="maze"){ clearInterval(state.enemyTimer); clearInterval(state.clockTimer); clearTimeout(state.actionTimer); }
+  if(type==="maze"){ stopMazeMovement(); clearInterval(state.enemyTimer); clearInterval(state.clockTimer); clearTimeout(state.actionTimer); }
   else{ clearInterval(state.clockTimer); clearTimeout(state.waveTimer); clearTimeout(state.actionTimer); }
   state.done=true;
   if(cleared) state.score+=Math.max(0,Math.round(300-elapsed*3));
