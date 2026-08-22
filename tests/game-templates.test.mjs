@@ -69,6 +69,16 @@ test("maze geometry expands answer zones and starts for larger odd boards", () =
   assert.equal(geometry.protectedPositions.some(({ x, y }) => x === 10 && y === 10), true);
 });
 
+test("maze keyboard input supports iPad and cross-browser key formats", () => {
+  assert.equal(games.mazeDirectionFromKeyboardEvent({ key: "ArrowUp" }), "up");
+  assert.equal(games.mazeDirectionFromKeyboardEvent({ key: "w" }), "up");
+  assert.equal(games.mazeDirectionFromKeyboardEvent({ code: "KeyD" }), "right");
+  assert.equal(games.mazeDirectionFromKeyboardEvent({ keyIdentifier: "Left" }), "left");
+  assert.equal(games.mazeDirectionFromKeyboardEvent({ keyCode: 40 }), "down");
+  assert.equal(games.mazeDirectionFromKeyboardEvent({ which: 87 }), "up");
+  assert.equal(games.mazeDirectionFromKeyboardEvent({ key: "Enter" }), null);
+});
+
 test("maze movement stays in bounds and cannot enter a wall", () => {
   const walls = new Set(["2,1"]);
 

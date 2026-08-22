@@ -272,6 +272,7 @@
     box-shadow:inset 0 0 28px rgba(0,0,0,.5);touch-action:none;position:relative;
     contain:layout paint;
   }
+  .maze-stage:focus-visible{outline:3px solid var(--accent-2);outline-offset:3px}
   .maze-cell{position:relative;display:grid;place-items:center;min-width:0;border:1px solid rgba(91,102,170,.13)}
   .maze-cell.wall{background:linear-gradient(135deg,#4d568d,#30385f);box-shadow:inset 0 0 0 2px rgba(255,255,255,.05)}
   .maze-answer{
@@ -738,7 +739,7 @@
           <div class="timer"><span id="mazeTime">0.0</span><small>秒</small></div>
         </div>
         <div class="arcade-prompt"><small>移動角色到正確答案區</small><b id="mazePrompt">—</b></div>
-        <div class="maze-stage" id="mazeStage" aria-label="Maze Chase 迷宮追逐遊戲區"></div>
+        <div class="maze-stage" id="mazeStage" tabindex="0" aria-label="Maze Chase 迷宮追逐遊戲區，可使用方向鍵或 WASD 移動" aria-describedby="mazeStatus"></div>
         <div class="correct-feedback" id="mazeFeedback" role="status" aria-live="assertive" aria-atomic="true">
           <span class="feedback-main">✓ 答對了！</span><span class="feedback-points"></span>
         </div>
@@ -1642,6 +1643,12 @@ function resetMazeActors(){
   mazeS.enemies=mazeS.geometry.enemyStarts.map(enemy=>({...enemy}));
 }
 function mazeWallSignature(walls){ return [...walls].sort().join("|"); }
+function focusMazeStage(){
+  const stage=$("#mazeStage");
+  if(!mazeS||mazeS.done)return;
+  try{ stage.focus({preventScroll:true}); }
+  catch(error){ stage.focus(); }
+}
 function createNextMazeWalls(){
   let walls,signature="";
   for(let attempt=0;attempt<8;attempt++){
@@ -1687,6 +1694,7 @@ function loadMazeQuestion(){
   $("#mazeHearts").textContent="❤️".repeat(mazeS.hearts)+"🖤".repeat(3-mazeS.hearts);
   setArcadeStatus("#mazeStatus",`${mazeS.difficulty.label} ${mazeS.size}×${mazeS.size}｜怪物會找最短路徑追你！`);
   buildMazeBoard();
+  focusMazeStage();
 }
 function buildMazeBoard(){
   const stage=$("#mazeStage"), fragment=document.createDocumentFragment();
@@ -1778,9 +1786,9 @@ function mazeLoseLife(message){
 $$('[data-maze-move]').forEach(button=>button.addEventListener("click",()=>mazeMove(button.dataset.mazeMove)));
 document.addEventListener("keydown",event=>{
   if(!mazeS||mazeS.done||$("#screen-maze").style.display==="none") return;
-  const direction={ArrowUp:"up",w:"up",W:"up",ArrowDown:"down",s:"down",S:"down",ArrowLeft:"left",a:"left",A:"left",ArrowRight:"right",d:"right",D:"right"}[event.key];
+  const direction=ARCADE.mazeDirectionFromKeyboardEvent(event);
   if(direction){ event.preventDefault(); mazeMove(direction); }
-});
+},true);
 
 /* ================= Whack-a-Mole 打地鼠 ================= */
 function startWhack(deck){
