@@ -37,6 +37,7 @@ test("app shell offers Maze Chase and Whack-a-Mole mobile templates", async () =
   assert.match(html, /data-type="maze"/);
   assert.match(html, /Maze Chase/);
   assert.match(html, /id="screen-maze"/);
+  assert.match(html, /id="mazeStage"[^>]*tabindex="0"/);
   assert.match(html, /data-maze-move="up"/);
   assert.match(html, /data-maze-move="left"/);
   assert.match(html, /data-maze-move="right"/);
@@ -76,12 +77,14 @@ test("arcade templates update smoothly and make correct answers unmistakable", a
   assert.match(html, /--maze-size/);
   assert.match(html, /difficulty\.enemyMoveMs/);
   assert.match(html, /whackS\.difficulty\.whackStayMs/);
+  assert.match(html, /function focusMazeStage\(/);
+  assert.match(html, /ARCADE\.mazeDirectionFromKeyboardEvent\(event\)/);
 });
 
 test("service worker caches every offline-critical asset", async () => {
   const worker = await read("service-worker.js");
 
-  assert.match(worker, /const CACHE_NAME = "match-master-v9"/);
+  assert.match(worker, /const CACHE_NAME = "match-master-v10"/);
   for (const asset of [
     "./",
     "./index.html",

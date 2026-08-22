@@ -81,6 +81,24 @@
     right: { x: 1, y: 0 }
   };
 
+  const MAZE_KEY_DIRECTIONS = Object.freeze({
+    ArrowUp: "up", Up: "up", UIKeyInputUpArrow: "up", w: "up", W: "up", KeyW: "up", "U+0057": "up",
+    ArrowDown: "down", Down: "down", UIKeyInputDownArrow: "down", s: "down", S: "down", KeyS: "down", "U+0053": "down",
+    ArrowLeft: "left", Left: "left", UIKeyInputLeftArrow: "left", a: "left", A: "left", KeyA: "left", "U+0041": "left",
+    ArrowRight: "right", Right: "right", UIKeyInputRightArrow: "right", d: "right", D: "right", KeyD: "right", "U+0044": "right"
+  });
+  const MAZE_KEYCODE_DIRECTIONS = Object.freeze({
+    37: "left", 38: "up", 39: "right", 40: "down",
+    65: "left", 68: "right", 83: "down", 87: "up"
+  });
+
+  function mazeDirectionFromKeyboardEvent(event = {}) {
+    for (const value of [event.key, event.code, event.keyIdentifier]) {
+      if (value && MAZE_KEY_DIRECTIONS[value]) return MAZE_KEY_DIRECTIONS[value];
+    }
+    return MAZE_KEYCODE_DIRECTIONS[event.keyCode || event.which] || null;
+  }
+
   function positionKey(position) {
     return `${position.x},${position.y}`;
   }
@@ -194,6 +212,7 @@
     createChoiceQuestions,
     getArcadeDifficulty,
     createMazeGeometry,
+    mazeDirectionFromKeyboardEvent,
     moveMazePlayer,
     chooseEnemyStep,
     isMazeConnected,
