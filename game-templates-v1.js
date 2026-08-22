@@ -78,6 +78,13 @@
     return { ...nearest[Math.floor(random() * nearest.length)] };
   }
 
+  function findMazeTarget(position, targets) {
+    return targets.findIndex((target) => {
+      const cells = Array.isArray(target.cells) ? target.cells : [target];
+      return cells.some((cell) => cell.x === position.x && cell.y === position.y);
+    });
+  }
+
   function createWhackWave(question, holeCount = 9, activeCount = 3, random = Math.random) {
     if (!question || !question.answer || !Array.isArray(question.options)) {
       throw new Error("題目格式不完整");
@@ -105,6 +112,7 @@
     createChoiceQuestions,
     moveMazePlayer,
     chooseEnemyStep,
+    findMazeTarget,
     createWhackWave
   });
 })(window);

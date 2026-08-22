@@ -68,6 +68,17 @@ test("maze enemy chooses a legal step that approaches the player", () => {
   assert.deepEqual(JSON.parse(JSON.stringify(next)), { x: 0, y: 1 });
 });
 
+test("every visibly covered maze cell activates its answer zone", () => {
+  const targets = [
+    { cells: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }] },
+    { cells: [{ x: 5, y: 0 }, { x: 6, y: 0 }, { x: 5, y: 1 }, { x: 6, y: 1 }] }
+  ];
+
+  assert.equal(games.findMazeTarget({ x: 1, y: 1 }, targets), 0);
+  assert.equal(games.findMazeTarget({ x: 5, y: 1 }, targets), 1);
+  assert.equal(games.findMazeTarget({ x: 3, y: 3 }, targets), -1);
+});
+
 test("whack wave has one correct mole, distinct holes, and wrong distractors", () => {
   const question = {
     prompt: "蘋果",

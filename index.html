@@ -1542,8 +1542,10 @@ const ARCADE=window.GAME_TEMPLATES;
 const MAZE_SIZE=7;
 const MAZE_WALLS=new Set(["2,1","4,1","1,2","5,2","2,3","4,3","1,4","5,4","2,5","4,5"]);
 const MAZE_TARGETS=[
-  {x:0,y:0,edge:"left-edge top-edge"}, {x:6,y:0,edge:"right-edge top-edge"},
-  {x:0,y:6,edge:"left-edge bottom-edge"}, {x:6,y:6,edge:"right-edge bottom-edge"}
+  {x:0,y:0,edge:"left-edge top-edge",cells:[{x:0,y:0},{x:1,y:0},{x:0,y:1},{x:1,y:1}]},
+  {x:6,y:0,edge:"right-edge top-edge",cells:[{x:5,y:0},{x:6,y:0},{x:5,y:1},{x:6,y:1}]},
+  {x:0,y:6,edge:"left-edge bottom-edge",cells:[{x:0,y:5},{x:1,y:5},{x:0,y:6},{x:1,y:6}]},
+  {x:6,y:6,edge:"right-edge bottom-edge",cells:[{x:5,y:5},{x:6,y:5},{x:5,y:6},{x:6,y:6}]}
 ];
 let mazeS=null;
 let whackS=null;
@@ -1611,7 +1613,7 @@ function mazeMove(direction){
   const next=ARCADE.moveMazePlayer(mazeS.player,direction,MAZE_SIZE,MAZE_WALLS);
   mazeS.player=next;
   if(mazeS.enemies.some(enemy=>samePosition(enemy,next))){ mazeLoseLife("被敵人抓到了！"); return; }
-  const targetIndex=MAZE_TARGETS.findIndex(target=>samePosition(target,next));
+  const targetIndex=ARCADE.findMazeTarget(next,MAZE_TARGETS);
   if(targetIndex>=0){ resolveMazeAnswer(targetIndex); return; }
   renderMaze();
 }
@@ -1875,7 +1877,8 @@ $("#btnDelDeck").onclick=()=>{
   const d=decks.find(x=>x.id===editId); if(!d)return;
   if(!confirm(`確定刪除字庫「${d.name}」？此動作無法復原。`))return;
   decks=decks.filter(x=>x.id!==editId);
-  delete best[editId]; saveBest(); saveDecks();
+  delete best[editId]; delete best[`${editId}|maze`]; delete best[`${editId}|whack`];
+  saveBest(); saveDecks();
   editId=null; $("#editor").style.display="none"; $("#noDeck").style.display="block";
   renderMgr();
   if(selectedDeckId && !decks.find(x=>x.id===selectedDeckId)) selectedDeckId=decks[0]?.id||null;
