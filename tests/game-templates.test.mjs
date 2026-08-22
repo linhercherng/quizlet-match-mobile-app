@@ -38,6 +38,37 @@ test("choice questions reject decks with fewer than four distinct answers", () =
   );
 });
 
+test("arcade difficulty changes maze size, monster speed, and mole stay time", () => {
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(games.getArcadeDifficulty("easy"))),
+    { key: "easy", label: "簡單", mazeSize: 7, mazeWallCount: 10, enemyMoveMs: 900, whackStayMs: 3000 }
+  );
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(games.getArcadeDifficulty("normal"))),
+    { key: "normal", label: "普通", mazeSize: 9, mazeWallCount: 20, enemyMoveMs: 680, whackStayMs: 2200 }
+  );
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(games.getArcadeDifficulty("hard"))),
+    { key: "hard", label: "困難", mazeSize: 11, mazeWallCount: 32, enemyMoveMs: 460, whackStayMs: 1400 }
+  );
+  assert.equal(games.getArcadeDifficulty("unknown").key, "normal");
+});
+
+test("maze geometry expands answer zones and starts for larger odd boards", () => {
+  const geometry = games.createMazeGeometry(11);
+
+  assert.deepEqual(JSON.parse(JSON.stringify(geometry.playerStart)), { x: 5, y: 5 });
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(geometry.enemyStarts.map(({ x, y }) => ({ x, y })))),
+    [{ x: 0, y: 5 }, { x: 10, y: 5 }]
+  );
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(geometry.targets.map(({ x, y }) => ({ x, y })))),
+    [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 0, y: 10 }, { x: 10, y: 10 }]
+  );
+  assert.equal(geometry.protectedPositions.some(({ x, y }) => x === 10 && y === 10), true);
+});
+
 test("maze movement stays in bounds and cannot enter a wall", () => {
   const walls = new Set(["2,1"]);
 

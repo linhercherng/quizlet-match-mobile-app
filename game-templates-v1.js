@@ -43,6 +43,37 @@
     });
   }
 
+  const ARCADE_DIFFICULTIES = Object.freeze({
+    easy: Object.freeze({ key: "easy", label: "簡單", mazeSize: 7, mazeWallCount: 10, enemyMoveMs: 900, whackStayMs: 3000 }),
+    normal: Object.freeze({ key: "normal", label: "普通", mazeSize: 9, mazeWallCount: 20, enemyMoveMs: 680, whackStayMs: 2200 }),
+    hard: Object.freeze({ key: "hard", label: "困難", mazeSize: 11, mazeWallCount: 32, enemyMoveMs: 460, whackStayMs: 1400 })
+  });
+
+  function getArcadeDifficulty(key) {
+    return { ...(ARCADE_DIFFICULTIES[key] || ARCADE_DIFFICULTIES.normal) };
+  }
+
+  function createMazeGeometry(size) {
+    if (!Number.isInteger(size) || size < 7 || size % 2 === 0) {
+      throw new Error("迷宮尺寸必須是至少 7 的奇數");
+    }
+    const last = size - 1;
+    const center = Math.floor(size / 2);
+    const targets = [
+      { x: 0, y: 0, edge: "left-edge top-edge", cells: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }] },
+      { x: last, y: 0, edge: "right-edge top-edge", cells: [{ x: last - 1, y: 0 }, { x: last, y: 0 }, { x: last - 1, y: 1 }, { x: last, y: 1 }] },
+      { x: 0, y: last, edge: "left-edge bottom-edge", cells: [{ x: 0, y: last - 1 }, { x: 1, y: last - 1 }, { x: 0, y: last }, { x: 1, y: last }] },
+      { x: last, y: last, edge: "right-edge bottom-edge", cells: [{ x: last - 1, y: last - 1 }, { x: last, y: last - 1 }, { x: last - 1, y: last }, { x: last, y: last }] }
+    ];
+    const playerStart = { x: center, y: center };
+    const enemyStarts = [{ x: 0, y: center, emoji: "👾" }, { x: last, y: center, emoji: "👻" }];
+    const protectedPositions = [
+      ...targets.flatMap((target) => target.cells), playerStart,
+      { x: center, y: center - 1 }, { x: center, y: center + 1 }, ...enemyStarts
+    ];
+    return { targets, playerStart, enemyStarts, protectedPositions };
+  }
+
   const DIRECTIONS = {
     up: { x: 0, y: -1 },
     down: { x: 0, y: 1 },
@@ -161,6 +192,8 @@
 
   global.GAME_TEMPLATES = Object.freeze({
     createChoiceQuestions,
+    getArcadeDifficulty,
+    createMazeGeometry,
     moveMazePlayer,
     chooseEnemyStep,
     isMazeConnected,
