@@ -79,20 +79,25 @@ test("arcade templates update smoothly and make correct answers unmistakable", a
   assert.match(html, /whackS\.difficulty\.whackStayMs/);
   assert.match(html, /function focusMazeStage\(/);
   assert.match(html, /ARCADE\.mazeDirectionFromKeyboardEvent\(event\)/);
-  assert.match(html, /function startMazeMovement\(/);
-  assert.match(html, /function stopMazeMovement\(/);
   assert.match(html, /difficulty\.playerMoveMs/);
   assert.match(html, /"pointerdown"/);
-  assert.match(html, /"pointerup"/);
-  assert.match(html, /"pointercancel"/);
-  assert.match(html, /document\.addEventListener\("keyup"/);
-  assert.match(html, /window\.addEventListener\("blur",\(\)=>stopMazeMovement\(\)\)/);
+});
+
+test("maze controls move exactly one cell for each press", async () => {
+  const html = await read("index.html");
+
+  assert.doesNotMatch(html, /mazeMovementTimer/);
+  assert.doesNotMatch(html, /function startMazeMovement\(/);
+  assert.doesNotMatch(html, /function stopMazeMovement\(/);
+  assert.match(html, /button\.addEventListener\("pointerdown",event=>\{[\s\S]*?mazeMove\(direction\);[\s\S]*?\}\);/);
+  assert.match(html, /document\.addEventListener\("keydown",event=>\{[\s\S]*?if\(event\.repeat\)return;[\s\S]*?mazeMove\(direction\);[\s\S]*?\},true\);/);
+  assert.match(html, /每按一次移動一格/);
 });
 
 test("service worker caches every offline-critical asset", async () => {
   const worker = await read("service-worker.js");
 
-  assert.match(worker, /const CACHE_NAME = "match-master-v11"/);
+  assert.match(worker, /const CACHE_NAME = "match-master-v12"/);
   for (const asset of [
     "./",
     "./index.html",
