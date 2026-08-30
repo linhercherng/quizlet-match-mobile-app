@@ -105,10 +105,20 @@ test("Maze Chase starts with five hearts and keeps lost hearts visible", async (
   assert.doesNotMatch(html, /repeat\(3-mazeS\.hearts\)/);
 });
 
+test("iPad landscape keeps maze controls visible and disables double-tap zoom", async () => {
+  const html = await read("index.html");
+
+  assert.match(html, /html,body\{[^}]*touch-action:manipulation/);
+  assert.match(html, /@media\(orientation:landscape\) and \(min-width:700px\) and \(max-height:900px\)/);
+  assert.match(html, /#screen-maze \.arcade-card\{[^}]*grid-template-areas:/);
+  assert.match(html, /#screen-maze \.maze-stage\{[^}]*calc\(100svh - 175px\)/);
+  assert.match(html, /#screen-maze \.maze-controls\{grid-area:controls/);
+});
+
 test("service worker caches every offline-critical asset", async () => {
   const worker = await read("service-worker.js");
 
-  assert.match(worker, /const CACHE_NAME = "match-master-v14"/);
+  assert.match(worker, /const CACHE_NAME = "match-master-v15"/);
   for (const asset of [
     "./",
     "./index.html",
