@@ -44,9 +44,9 @@
   }
 
   const ARCADE_DIFFICULTIES = Object.freeze({
-    easy: Object.freeze({ key: "easy", label: "簡單", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 900, whackStayMs: 3000 }),
-    normal: Object.freeze({ key: "normal", label: "普通", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 680, whackStayMs: 2200 }),
-    hard: Object.freeze({ key: "hard", label: "困難", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 460, whackStayMs: 1400 })
+    easy: Object.freeze({ key: "easy", label: "簡單", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 900, whackStayMs: 5000 }),
+    normal: Object.freeze({ key: "normal", label: "普通", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 680, whackStayMs: 5000 }),
+    hard: Object.freeze({ key: "hard", label: "困難", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 460, whackStayMs: 5000 })
   });
 
   function getArcadeDifficulty(key) {
@@ -159,7 +159,36 @@
     return visited.size === size * size - walls.size;
   }
 
-  function createRandomMazeWalls(size, wallCount, protectedPositions = [], random = Math.random) {
+  function canReachMazeTarget(size, walls, playerStart, targets, targetIndex) {
+    const targetKeys = new Set((targets[targetIndex].cells || [targets[targetIndex]]).map(positionKey));
+    const blockedAnswerKeys = new Set(targets.flatMap((target, index) => (
+      index === targetIndex ? [] : (target.cells || [target]).map(positionKey)
+    )));
+    const startKey = positionKey(playerStart);
+    if (walls.has(startKey) || blockedAnswerKeys.has(startKey)) return false;
+
+    const queue = [{ ...playerStart }];
+    const visited = new Set([startKey]);
+    while (queue.length) {
+      const current = queue.shift();
+      if (targetKeys.has(positionKey(current))) return true;
+      for (const delta of Object.values(DIRECTIONS)) {
+        const next = { x: current.x + delta.x, y: current.y + delta.y };
+        const key = positionKey(next);
+        if (visited.has(key) || !legalPosition(next, size, walls, blockedAnswerKeys)) continue;
+        visited.add(key); queue.push(next);
+      }
+    }
+    return false;
+  }
+
+  function areMazeTargetsSafelyReachable(size, walls, playerStart, targets) {
+    return targets.every((_, targetIndex) => (
+      canReachMazeTarget(size, walls, playerStart, targets, targetIndex)
+    ));
+  }
+
+  function createRandomMazeWalls(size, wallCount, protectedPositions = [], random = Math.random, routePlan = null) {
     const protectedKeys = new Set(protectedPositions.map(positionKey));
     const candidates = [];
     for (let y = 0; y < size; y += 1) {
@@ -173,7 +202,11 @@
     for (const key of shuffleCopy(candidates, random)) {
       if (walls.size >= wallCount) break;
       const trial = new Set(walls); trial.add(key);
-      if (isMazeConnected(size, trial)) walls.add(key);
+      const connected = isMazeConnected(size, trial);
+      const routesAreSafe = connected && (!routePlan || areMazeTargetsSafelyReachable(
+        size, trial, routePlan.playerStart, routePlan.targets
+      ));
+      if (routesAreSafe) walls.add(key);
     }
     return walls;
   }
@@ -216,6 +249,7 @@
     moveMazePlayer,
     chooseEnemyStep,
     isMazeConnected,
+    areMazeTargetsSafelyReachable,
     createRandomMazeWalls,
     findMazeTarget,
     createWhackWave
