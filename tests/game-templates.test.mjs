@@ -38,10 +38,10 @@ test("choice questions reject decks with fewer than four distinct answers", () =
   );
 });
 
-test("arcade difficulty keeps the largest maze and uses five-second mole timing", () => {
+test("arcade difficulty keeps the largest maze and scales mole timing", () => {
   assert.deepEqual(
     JSON.parse(JSON.stringify(games.getArcadeDifficulty("easy"))),
-    { key: "easy", label: "簡單", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 900, whackStayMs: 5000 }
+    { key: "easy", label: "簡單", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 900, whackStayMs: 7000 }
   );
   assert.deepEqual(
     JSON.parse(JSON.stringify(games.getArcadeDifficulty("normal"))),
@@ -49,7 +49,7 @@ test("arcade difficulty keeps the largest maze and uses five-second mole timing"
   );
   assert.deepEqual(
     JSON.parse(JSON.stringify(games.getArcadeDifficulty("hard"))),
-    { key: "hard", label: "困難", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 460, whackStayMs: 5000 }
+    { key: "hard", label: "困難", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 460, whackStayMs: 3000 }
   );
   assert.equal(games.getArcadeDifficulty("unknown").key, "normal");
 });
