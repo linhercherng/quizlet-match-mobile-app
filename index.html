@@ -1681,9 +1681,10 @@ function focusMazeStage(){
   catch(error){ stage.focus(); }
 }
 function createNextMazeWalls(){
+  const routePlan={playerStart:mazeS.geometry.playerStart,targets:mazeS.geometry.targets};
   let walls,signature="";
   for(let attempt=0;attempt<8;attempt++){
-    walls=ARCADE.createRandomMazeWalls(mazeS.size,mazeS.difficulty.mazeWallCount,mazeS.geometry.protectedPositions);
+    walls=ARCADE.createRandomMazeWalls(mazeS.size,mazeS.difficulty.mazeWallCount,mazeS.geometry.protectedPositions,Math.random,routePlan);
     signature=mazeWallSignature(walls);
     if(signature!==mazeS.wallSignature) break;
   }
@@ -1693,7 +1694,9 @@ function createNextMazeWalls(){
         const addKey=`${x},${y}`;
         if(walls.has(addKey)||mazeS.geometry.protectedPositions.some(cell=>cell.x===x&&cell.y===y)) continue;
         const alternative=new Set(walls); alternative.delete(removeKey); alternative.add(addKey);
-        if(ARCADE.isMazeConnected(mazeS.size,alternative)){ walls=alternative; signature=mazeWallSignature(walls); break outer; }
+        if(ARCADE.isMazeConnected(mazeS.size,alternative) && ARCADE.areMazeTargetsSafelyReachable(mazeS.size,alternative,routePlan.playerStart,routePlan.targets)){
+          walls=alternative; signature=mazeWallSignature(walls); break outer;
+        }
       }
     }
   }

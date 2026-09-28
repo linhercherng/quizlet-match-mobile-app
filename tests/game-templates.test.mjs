@@ -38,18 +38,18 @@ test("choice questions reject decks with fewer than four distinct answers", () =
   );
 });
 
-test("arcade difficulty keeps the largest maze and changes monster speed and mole stay time", () => {
+test("arcade difficulty keeps the largest maze and uses five-second mole timing", () => {
   assert.deepEqual(
     JSON.parse(JSON.stringify(games.getArcadeDifficulty("easy"))),
-    { key: "easy", label: "簡單", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 900, whackStayMs: 3000 }
+    { key: "easy", label: "簡單", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 900, whackStayMs: 5000 }
   );
   assert.deepEqual(
     JSON.parse(JSON.stringify(games.getArcadeDifficulty("normal"))),
-    { key: "normal", label: "普通", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 680, whackStayMs: 2200 }
+    { key: "normal", label: "普通", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 680, whackStayMs: 5000 }
   );
   assert.deepEqual(
     JSON.parse(JSON.stringify(games.getArcadeDifficulty("hard"))),
-    { key: "hard", label: "困難", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 460, whackStayMs: 1400 }
+    { key: "hard", label: "困難", mazeSize: 11, mazeWallCount: 32, playerMoveMs: 95, enemyMoveMs: 460, whackStayMs: 5000 }
   );
   assert.equal(games.getArcadeDifficulty("unknown").key, "normal");
 });
@@ -160,6 +160,27 @@ test("random maze walls vary while preserving protected cells and connectivity",
   assert.ok(protectedCells.every(({ x, y }) => !first.has(`${x},${y}`)));
   assert.equal(games.isMazeConnected(7, first), true);
   assert.equal(games.isMazeConnected(7, second), true);
+});
+
+test("every answer stays reachable without crossing a different answer zone", () => {
+  const geometry = games.createMazeGeometry(11);
+  const seededRandom = (seed) => () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+  const walls = games.createRandomMazeWalls(
+    11,
+    32,
+    geometry.protectedPositions,
+    seededRandom(17),
+    { playerStart: geometry.playerStart, targets: geometry.targets }
+  );
+
+  assert.equal(walls.size, 32);
+  assert.equal(
+    games.areMazeTargetsSafelyReachable(11, walls, geometry.playerStart, geometry.targets),
+    true
+  );
 });
 
 test("a monster can reach a stationary player in a generated maze", () => {
