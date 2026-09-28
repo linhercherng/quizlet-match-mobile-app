@@ -241,6 +241,10 @@
     }));
   }
 
+  function getWhackRemainingMs(stayMs, waveStartedAt, now) {
+    return Math.max(0, stayMs - (now - waveStartedAt));
+  }
+
   global.GAME_TEMPLATES = Object.freeze({
     createChoiceQuestions,
     getArcadeDifficulty,
@@ -252,6 +256,7 @@
     areMazeTargetsSafelyReachable,
     createRandomMazeWalls,
     findMazeTarget,
-    createWhackWave
+    createWhackWave,
+    getWhackRemainingMs
   });
 })(window);
