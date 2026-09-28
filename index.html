@@ -790,7 +790,7 @@
             <span class="chip" id="whackHearts">❤️❤️❤️❤️❤️</span>
             <span class="chip">分數 <b id="whackScore">0</b></span>
           </div>
-          <div class="timer"><span id="whackTime">0.0</span><small>秒</small></div>
+          <div class="timer"><span id="whackTime">0.0</span><small>本輪剩餘秒</small></div>
         </div>
         <div class="arcade-prompt"><small>只敲出正確答案的地鼠</small><b id="whackPrompt">—</b></div>
         <div class="whack-grid" id="whackGrid" aria-label="Whack-a-Mole 打地鼠遊戲區"></div>
@@ -1848,8 +1848,13 @@ function startWhack(deck){
   $("#whackTotal").textContent=questions.length;
   showScreen("whack");
   buildWhackGrid();
-  whackS.clockTimer=setInterval(()=>{ if(!whackS.done) $("#whackTime").textContent=((performance.now()-whackS.startAt)/1000).toFixed(1); },200);
+  whackS.clockTimer=setInterval(updateWhackCountdown,100);
   loadWhackQuestion();
+}
+function updateWhackCountdown(now=performance.now()){
+  if(!whackS||whackS.done||!whackS.waveStartedAt) return;
+  const remaining=ARCADE.getWhackRemainingMs(whackS.difficulty.whackStayMs,whackS.waveStartedAt,now);
+  $("#whackTime").textContent=(remaining/1000).toFixed(1);
 }
 function loadWhackQuestion(){
   if(!whackS||whackS.done) return;
@@ -1868,7 +1873,7 @@ function showWhackWave(){
   if(!whackS||whackS.done) return;
   clearTimeout(whackS.waveTimer); whackS.locked=false;
   whackS.wave=ARCADE.createWhackWave(whackS.questions[whackS.idx],9,3);
-  whackS.waveStartedAt=performance.now(); renderWhack();
+  whackS.waveStartedAt=performance.now(); updateWhackCountdown(whackS.waveStartedAt); renderWhack();
   whackS.waveTimer=setTimeout(()=>whackMistake("太慢了！正確地鼠跑掉了"),whackS.difficulty.whackStayMs);
 }
 function buildWhackGrid(){
@@ -1938,7 +1943,10 @@ function finishArcade(type,cleared){
   $("#arcadeWinEmoji").textContent=cleared?(state.hearts>1?"🏆":"🎉"):"💪";
   $("#arcadeWinTitle").textContent=cleared?(type==="maze"?"成功逃出迷宮！":"打地鼠挑戰完成！"):"愛心用完了，再挑戰一次！";
   $("#arcadeWinScore").textContent=state.score;
-  $("#arcadeWinSub").innerHTML=`完成 <b>${state.idx}</b> / ${state.questions.length} 題 · ${elapsed.toFixed(1)} 秒${isBest?' · <span class="best-flag">刷新最高分！</span>':` · 最高 ${previous} 分`}`;
+  const timeSummary=type==="whack"
+    ? `${state.difficulty.label}（每波 ${(state.difficulty.whackStayMs/1000).toFixed(1)} 秒） · 總遊戲時間 ${elapsed.toFixed(1)} 秒`
+    : `${elapsed.toFixed(1)} 秒`;
+  $("#arcadeWinSub").innerHTML=`完成 <b>${state.idx}</b> / ${state.questions.length} 題 · ${timeSummary}${isBest?' · <span class="best-flag">刷新最高分！</span>':` · 最高 ${previous} 分`}`;
   showScreen("arcadewin");
 }
 function quitArcade(){ cleanupArcade(); showScreen("start"); renderDeckList(); }

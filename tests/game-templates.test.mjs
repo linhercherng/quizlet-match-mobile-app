@@ -221,3 +221,8 @@ test("whack wave has one correct mole, distinct holes, and wrong distractors", (
   assert.equal(wave.find((mole) => mole.correct).label, "apple");
   assert.ok(wave.filter((mole) => !mole.correct).every((mole) => mole.label !== "apple"));
 });
+
+test("whack countdown reports the current wave time remaining", () => {
+  assert.equal(games.getWhackRemainingMs(5000, 1000, 4200), 1800);
+  assert.equal(games.getWhackRemainingMs(5000, 1000, 6500), 0);
+});

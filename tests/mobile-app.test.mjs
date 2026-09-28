@@ -84,6 +84,16 @@ test("arcade templates update smoothly and make correct answers unmistakable", a
   assert.match(html, /"pointerdown"/);
 });
 
+test("Whack-a-Mole distinguishes wave countdown from total game time", async () => {
+  const html = await read("index.html");
+
+  assert.match(html, /function updateWhackCountdown\(/);
+  assert.match(html, /getWhackRemainingMs\(/);
+  assert.match(html, /本輪剩餘秒/);
+  assert.match(html, /每波.*whackStayMs/);
+  assert.match(html, /總遊戲時間/);
+});
+
 test("maze controls move exactly one cell for each press", async () => {
   const html = await read("index.html");
 
@@ -118,7 +128,7 @@ test("iPad landscape keeps maze controls visible and disables double-tap zoom", 
 test("service worker caches every offline-critical asset", async () => {
   const worker = await read("service-worker.js");
 
-  assert.match(worker, /const CACHE_NAME = "match-master-v17"/);
+  assert.match(worker, /const CACHE_NAME = "match-master-v18"/);
   for (const asset of [
     "./",
     "./index.html",
