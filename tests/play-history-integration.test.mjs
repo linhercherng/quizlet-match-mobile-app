@@ -4,27 +4,35 @@ import vm from "node:vm";
 import test from "node:test";
 
 function app(){
+  const html=readFileSync(new URL("../index.html",import.meta.url),"utf8");
+  const gameButtons=[...html.match(/id="segType">([\s\S]*?)<\/div>/)[1].matchAll(/data-g="([^"]+)"[^>]*>([^<]+)<\/button>/g)]
+    .map(([,game,label])=>({dataset:{g:game},textContent:label}));
   const values=new Map();
   const nodes=new Map();
   const node=selector=>{
-    if(!nodes.has(selector))nodes.set(selector,{value:"",hidden:true,textContent:"",addEventListener(){},replaceChildren(){}});
+    if(!nodes.has(selector))nodes.set(selector,{value:"",dataset:{game:""},hidden:true,textContent:"",children:[],addEventListener(){},replaceChildren(){},append(child){this.children.push(child);}});
     return nodes.get(selector);
   };
   node("#playerName1").value="Alice";node("#playerName2").value="小明";
   const context=vm.createContext({
-    window:{addEventListener(){}},document:{addEventListener(){},createElement:()=>({})},
+    window:{addEventListener(){}},document:{addEventListener(){},createElement:()=>({dataset:{},addEventListener(){},setAttribute(){}})},
     localStorage:{getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,value)},
     crypto:{randomUUID:()=>`session-${values.get("matchgame.history.v1")?.length??0}`},
-    performance:{now:()=>5000},$ :node,$$:()=>[],Date,Intl,
+    performance:{now:()=>5000},$ :node,$$:selector=>selector==="#segType button"?gameButtons:[],Date,Intl,
     cfg:{dir:"both"},spellCfg:{diff:"hard",rule:"practice",clue:"text"}
   });
   vm.runInContext(readFileSync(new URL("../play-history.js",import.meta.url),"utf8"),context);
   context.PLAY_HISTORY=context.window.PLAY_HISTORY;
-  const html=readFileSync(new URL("../index.html",import.meta.url),"utf8");
   vm.runInContext(html.slice(html.indexOf("const LOG_GAMES="),html.indexOf("/* 分頁切換 */")),context);
   context.deck={name:"L4 Week 1"};
   return {context,node,run:code=>vm.runInContext(code,context),logs:()=>JSON.parse(values.get("matchgame.history.v1"))};
 }
+
+test("history exposes all four game categories in the same order and names as the game menu",()=>{
+  const {node}=app();
+  const categories=node("#historyGame").children.map(button=>[button.dataset.game,button.textContent]);
+  assert.deepEqual(categories,[["","全部遊戲"],["match","🃏 配對"],["spell","🔤 拼字"],["maze","🧭 迷宮追逐"],["whack","🔨 打地鼠"]]);
+});
 
 test("duels keep each player's result and gameplay time, then replay creates a new session",()=>{
   const {context,run,logs}=app();
