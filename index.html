@@ -1080,7 +1080,8 @@ function renderPlayHistory(){
     const setup=document.createElement("p");setup.textContent=`字庫：${row.deck} · ${row.settings}`;
     const result=document.createElement("p");
     const status=activePlayLog?.record.id===row.id?"進行中":LOG_STATUS[row.status];
-    result.textContent=`${status}${row.player.result?`／${row.player.result==="win"?"獲勝":"落敗"}`:""} · 完成 ${row.player.correct} / ${row.total} 題 · 失誤／逾時 ${row.player.mistakes} 次${row.player.score===null?"":` · ${row.player.score} 分`} · 遊玩 ${row.player.seconds.toFixed(1)} 秒`;
+    const progress=row.total===null?`答對 ${row.player.correct} 題`:`完成 ${row.player.correct} / ${row.total} 題`;
+    result.textContent=`${status}${row.player.result?`／${row.player.result==="win"?"獲勝":"落敗"}`:""} · ${progress} · 失誤／逾時 ${row.player.mistakes} 次${row.player.score===null?"":` · ${row.player.score} 分`} · 遊玩 ${row.player.seconds.toFixed(1)} 秒`;
     entry.append(heading,when,setup,result);return entry;
   });
   if(!entries.length){const empty=document.createElement("p");empty.className="empty";empty.textContent="沒有符合條件的遊玩紀錄。";entries.push(empty);}
@@ -1584,7 +1585,7 @@ function startSpell(deck){
   updateSpellHud();
   showScreen("spell");
   spellS.startAt=performance.now();
-  startPlayLog(deck,"spell","solo",pool.length,[spellS]);
+  startPlayLog(deck,"spell","solo",spellS.rule==="timeattack"?null:pool.length,[spellS]);
   spellS.timer=setInterval(tickSpell,100);
   loadSpellWord();
 }

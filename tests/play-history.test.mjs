@@ -51,3 +51,11 @@ test("storage-full errors are reported and an existing session remains readable"
   assert.throws(()=>history.save(store,record("two")),/quota/);
   assert.equal(history.read(store).length,1);
 });
+
+test("timed spelling records correct answers without a fixed completion target",()=>{
+  const store=storage();
+  history.save(store,{...record(),game:"spell",total:null,players:[{...player("小明"),correct:20}]});
+  assert.equal(history.read(store)[0].total,null);
+  assert.equal(history.read(store)[0].players[0].correct,20);
+  assert.throws(()=>history.save(store,{...record("invalid"),game:"whack",total:null}));
+});

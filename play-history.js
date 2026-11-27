@@ -8,7 +8,7 @@
   function validate(record){
     if(!record||!text(record.id)||!text(record.deck)||!text(record.settings)||
       !games.includes(record.game)||!["solo","vs"].includes(record.mode)||
-      !statuses.includes(record.status)||!count(record.total)||
+      !statuses.includes(record.status)||!(count(record.total)||(record.total===null&&record.game==="spell"&&record.mode==="solo"))||
       !Number.isFinite(record.startedAt)||record.startedAt<=0||!Number.isFinite(new Date(record.startedAt).getTime())||
       !(record.endedAt===null||(Number.isFinite(record.endedAt)&&record.endedAt>=record.startedAt&&Number.isFinite(new Date(record.endedAt).getTime())))||
       !Array.isArray(record.players)||record.players.length!==(record.mode==="vs"?2:1)||
