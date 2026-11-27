@@ -156,6 +156,9 @@
   .log-entry p{color:var(--muted);line-height:1.6}
   .log-filters{display:flex;flex-wrap:wrap;gap:12px}
   .log-filters label{flex:1;min-width:180px}
+  .log-filters .history-games{flex:2;min-width:220px}
+  #historyGame{display:flex;flex-wrap:wrap}
+  #historyGame button{min-height:44px;flex:0 0 auto;white-space:nowrap}
   .log-warning{color:var(--bad);padding:12px;border:1px solid var(--bad);border-radius:12px;margin-bottom:14px}
   .seg{display:flex;flex-wrap:wrap;gap:6px;background:var(--bg);padding:5px;border-radius:11px;border:1px solid var(--line)}
   .seg button{border:0;background:transparent;color:var(--muted);padding:8px 15px;border-radius:8px;cursor:pointer;font-weight:600;font-size:15px}
@@ -571,8 +574,8 @@
             <div class="seg" id="segType">
               <button data-g="match" class="on">🃏 配對</button>
               <button data-g="spell">🔤 拼字</button>
-              <button data-g="maze" data-type="maze">🧭 Maze Chase</button>
-              <button data-g="whack" data-type="whack">🔨 Whack-a-Mole</button>
+              <button data-g="maze" data-type="maze">🧭 迷宮追逐</button>
+              <button data-g="whack" data-type="whack">🔨 打地鼠</button>
             </div>
           </div>
           <div class="opt-line">
@@ -856,9 +859,10 @@
         <label class="fld" for="historyPlayer">玩家名稱
           <input id="historyPlayer" list="knownPlayers" placeholder="全部玩家／輸入名稱搜尋" maxlength="40">
         </label>
-        <label class="fld" for="historyGame">遊戲類型
-          <select id="historyGame"><option value="">全部遊戲</option value="match">配對</option><option value="spell">拼字</option><option value="maze">迷宮追逐</option><option value="whack">打地鼠</option></select>
-        </label>
+        <div class="history-games">
+          <span class="fld" id="historyGameLabel">遊戲類型</span>
+          <div class="seg" id="historyGame" role="group" aria-labelledby="historyGameLabel" data-game=""></div>
+        </div>
       </div>
       <p class="hint" id="historyCount" role="status" aria-live="polite"></p>
       <div class="log-list" id="historyRows"></div>
@@ -1005,7 +1009,7 @@ function toast(msg, kind=""){
 }
 
 /* ================= 玩家與遊玩紀錄 ================= */
-const LOG_GAMES={match:"配對",spell:"拼字",maze:"迷宮追逐",whack:"打地鼠"};
+const LOG_GAMES=Object.fromEntries($$("#segType button").map(button=>[button.dataset.g,button.textContent.trim()]));
 const LOG_STATUS={running:"未結束（最後存檔）",completed:"完成",failed:"愛心用完",timeup:"時間到",quit:"中途結束",interrupted:"中斷"};
 let activePlayLog=null, historyPage=0;
 try{
@@ -1066,7 +1070,7 @@ function refreshKnownPlayers(){
 function renderPlayHistory(){
   checkpointPlayLog();
   let rows;
-  try{ rows=PLAY_HISTORY.query(PLAY_HISTORY.read(localStorage),{player:$("#historyPlayer").value,game:$("#historyGame").value}); }
+  try{ rows=PLAY_HISTORY.query(PLAY_HISTORY.read(localStorage),{player:$("#historyPlayer").value,game:$("#historyGame").dataset.game}); }
   catch(error){logError(error);$("#historyRows").replaceChildren();$("#historyCount").textContent="紀錄無法載入，請查看上方訊息。";return;}
   historyPage=Math.min(historyPage,Math.max(0,Math.ceil(rows.length/20)-1));
   $("#historyCount").textContent=`共 ${rows.length} 筆玩家遊玩紀錄（新到舊）`;
@@ -1091,7 +1095,19 @@ function renderPlayHistory(){
   $("#historyNext").disabled=(historyPage+1)*20>=rows.length;
 }
 $("#historyPlayer").addEventListener("input",()=>{historyPage=0;renderPlayHistory();});
-$("#historyGame").addEventListener("change",()=>{historyPage=0;renderPlayHistory();});
+for(const [game,label] of [["","全部遊戲"],...Object.entries(LOG_GAMES)]){
+  const button=document.createElement("button");
+  button.type="button";button.textContent=label;button.dataset.game=game;
+  button.className=game?"":"on";button.setAttribute("aria-pressed",String(!game));
+  button.addEventListener("click",()=>{
+    $("#historyGame").dataset.game=game;
+    $$("#historyGame button").forEach(item=>{
+      item.classList.toggle("on",item===button);item.setAttribute("aria-pressed",String(item===button));
+    });
+    historyPage=0;renderPlayHistory();
+  });
+  $("#historyGame").append(button);
+}
 $("#historyPrev").onclick=()=>{historyPage--;renderPlayHistory();};
 $("#historyNext").onclick=()=>{historyPage++;renderPlayHistory();};
 window.addEventListener("pagehide",checkpointPlayLog);
