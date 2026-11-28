@@ -75,3 +75,11 @@ test("checkpoint preserves an unfinished play and storage failure is visible",()
   assert.match(node("#logWarning").textContent,/quota/);
   assert.equal(logs().length,1);
 });
+
+test("Chinese matching sessions identify the chosen content in play history",()=>{
+  const {context,run,logs}=app();
+  context.cfg.matchLanguage="zh";
+  context.states=[{total:4,remain:0,miss:0,startAt:1000,finalT:4}];
+  run('startPlayLog(deck,"match","solo",4,states);closePlayLog("completed");');
+  assert.match(logs()[0].settings,/英文 ↔ 中文意思/);
+});
