@@ -11,7 +11,7 @@ const decks=context.window.BUILTIN_DECKS;
 const {chineseMeaning,matchingPairs}=context.window.MATCH_CONTENT;
 const copy=value=>JSON.parse(JSON.stringify(value));
 
-test("all 709 built-in entries have Traditional Chinese meanings without changing the original pairs",()=>{
+test("all 793 built-in entries have Traditional Chinese meanings without changing the original pairs",()=>{
   const before=JSON.stringify(decks);
   let count=0;
   for(const deck of decks){
@@ -23,7 +23,7 @@ test("all 709 built-in entries have Traditional Chinese meanings without changin
     assert.ok(chinese.length>=2,deck.name);
     assert.equal(new Set(chinese.map(pair=>pair[1])).size,chinese.length);
   }
-  assert.equal(count,709);
+  assert.equal(count,793);
   assert.equal(JSON.stringify(decks),before);
 });
 

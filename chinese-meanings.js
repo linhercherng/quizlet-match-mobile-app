@@ -40,6 +40,7 @@
   const translations=new Map();
   const key=pair=>JSON.stringify(pair.slice(0,2));
   for(const deck of global.BUILTIN_DECKS||[]){
+    if(deck.pairs.every(pair=>typeof pair[2]==="string"&&pair[2].trim()))continue;
     const chinese=meanings[deck.name]?.split("|")||[];
     if(chinese.length!==deck.pairs.length)throw new Error(`中譯數量不符：${deck.name}`);
     deck.pairs.forEach((pair,index)=>translations.set(key(pair),chinese[index]));

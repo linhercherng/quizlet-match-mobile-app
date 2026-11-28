@@ -17,7 +17,7 @@ const l6WeekDecks = decks.slice(17, 33);
 const l6VerbDeck = decks[33];
 
 test("built-in library keeps L4 decks and adds L6-prefixed categories", () => {
-  assert.equal(decks.length, 34);
+  assert.equal(decks.length, 35);
   assert.deepEqual(
     l4WeekDecks.map((deck) => deck.name),
     expectedWeeks.map((week) => `L4 Week ${week}`)
@@ -48,7 +48,7 @@ test("existing saved Week deck names are migrated without changing other decks",
   );
 });
 
-test("existing saved libraries receive every missing L6 deck exactly once", () => {
+test("existing saved libraries receive missing L6 decks and the verb theme exactly once", () => {
   assert.equal(typeof mergeBuiltinDeckUpdates, "function");
   const savedDecks = [
     { id: "week-1", name: "L4 Week 1", pairs: [["one", "1"]] },
@@ -57,11 +57,11 @@ test("existing saved libraries receive every missing L6 deck exactly once", () =
 
   const merged = mergeBuiltinDeckUpdates(savedDecks, decks);
   const normalizedMerged = JSON.parse(JSON.stringify(merged));
-  assert.equal(merged.length, 19);
+  assert.equal(merged.length, 20);
   assert.deepEqual(normalizedMerged.slice(0, 2), savedDecks);
   assert.deepEqual(
     normalizedMerged.slice(2).map((deck) => deck.name),
-    [...expectedWeeks.map((week) => `L6 Week ${week}`), "L6 動詞三態"]
+    [...expectedWeeks.map((week) => `L6 Week ${week}`), "L6 動詞三態", "動詞三態主題"]
   );
   assert.strictEqual(mergeBuiltinDeckUpdates(merged, decks), merged);
 });
@@ -118,10 +118,34 @@ test("every deck pair is complete and terms are unique inside its deck", () => {
     assert.ok(deck.emoji && deck.name);
     const terms = new Set();
     for (const pair of deck.pairs) {
-      assert.equal(pair.length, 2);
+      assert.ok(pair.length === 2 || pair.length === 3);
       assert.ok(pair.every((value) => typeof value === "string" && value.trim().length > 0));
       assert.equal(terms.has(pair[0].toLowerCase()), false, `${deck.name}: ${pair[0]}`);
       terms.add(pair[0].toLowerCase());
     }
   }
+});
+
+test("the supplied verb theme retains all 84 verbs, alternative forms and exact Chinese meanings",()=>{
+  const theme=decks.find(deck=>deck.name==="動詞三態主題");
+  assert.equal(theme.pairs.length,84);
+  assert.deepEqual(theme.pairs.map(pair=>pair[0]).sort(),l4VerbDeck.pairs.map(pair=>pair[0]).sort());
+  const expected={
+    be:["was / were","been","是；在"],bear:["bore","borne / born","承受；生育"],
+    burn:["burned / burnt","burned / burnt","燃燒；燒傷"],can:["could","—","能；會；可以"],
+    dream:["dreamed / dreamt","dreamed / dreamt","做夢；夢想"],get:["got","got / gotten","得到；取得；變得"],
+    learn:["learned / learnt","learned / learnt","學習"],light:["lit / lighted","lit / lighted","點燃；照亮"],
+    quit:["quit / quitted","quit / quitted","停止；辭職"],shine:["shone / shined","shone / shined","發光；照耀"],
+    spell:["spelled / spelt","spelled / spelt","拼寫"],write:["wrote","written","寫"]
+  };
+  for(const [base,[past,participle,chinese]] of Object.entries(expected)){
+    assert.deepEqual(theme.pairs.find(pair=>pair[0]===base),[base,`過去式：${past}｜過去分詞：${participle}`,chinese]);
+  }
+});
+
+test("an edited existing verb theme is preserved rather than replaced or duplicated",()=>{
+  const edited={id:"my-theme",name:"動詞三態主題",pairs:[["be","自訂三態","自訂中文"]]};
+  const merged=mergeBuiltinDeckUpdates([edited],decks);
+  assert.strictEqual(merged[0],edited);
+  assert.equal(merged.filter(deck=>deck.name===edited.name).length,1);
 });
