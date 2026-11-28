@@ -128,12 +128,12 @@ test("iPad landscape keeps maze controls visible and disables double-tap zoom", 
 test("service worker caches every offline-critical asset", async () => {
   const worker = await read("service-worker.js");
 
-  assert.match(worker, /const CACHE_NAME = "match-master-v23"/);
+  assert.match(worker, /const CACHE_NAME = "match-master-v24"/);
   for (const asset of [
     "./",
     "./index.html",
     "./decks-v5.js?v=23",
-    "./chinese-meanings.js?v=23",
+    "./chinese-meanings.js?v=24",
     "./game-templates-v1.js",
     "./play-history.js",
     "./manifest.webmanifest",

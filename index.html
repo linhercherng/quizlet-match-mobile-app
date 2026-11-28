@@ -607,6 +607,8 @@
             <span>配對內容</span>
             <div class="seg" id="segMatchLanguage">
               <button data-language="original" class="on" type="button">原有配對</button>
+              <button data-language="past" class="opt-hidden" type="button">原形 ↔ 過去式</button>
+              <button data-language="participle" class="opt-hidden" type="button">原形 ↔ 過去分詞</button>
               <button data-language="zh" type="button">英文 ↔ 中文意思</button>
             </div>
           </div>
@@ -950,7 +952,7 @@
 </dialog>
 
 <script src="decks-v5.js?v=23"></script>
-<script src="chinese-meanings.js?v=23"></script>
+<script src="chinese-meanings.js?v=24"></script>
 <script src="game-templates-v1.js"></script>
 <script src="play-history.js"></script>
 <script>
@@ -1027,6 +1029,7 @@ function toast(msg, kind=""){
 
 /* ================= 玩家與遊玩紀錄 ================= */
 const LOG_GAMES=Object.fromEntries($$("#segType button").map(button=>[button.dataset.g,button.textContent.trim()]));
+const MATCH_LABELS={original:"原有配對",zh:"英文 ↔ 中文意思",past:"原形 ↔ 過去式",participle:"原形 ↔ 過去分詞"};
 const LOG_STATUS={running:"未結束（最後存檔）",completed:"完成",failed:"愛心用完",timeup:"時間到",quit:"中途結束",interrupted:"中斷"};
 let activePlayLog=null, historyPage=0;
 try{
@@ -1070,7 +1073,7 @@ function startPlayLog(deck,game,mode,total,states){
   try{ localStorage.setItem("matchgame.players.v1",JSON.stringify(names)); }catch(error){ logError(error); }
   const settings=game==="maze"||game==="whack"?states[0].difficulty.label:
     game==="spell"?`填空：${{easy:"簡單",mid:"中等",hard:"困難"}[spellCfg.diff]}／${mode==="vs"?"競速":{survival:"生存",timeattack:"限時",practice:"練習"}[spellCfg.rule]}／${mode==="solo"&&spellCfg.clue==="audio"?"聽寫":"文字"}`:
-    `${cfg.matchLanguage==="zh"?"英文 ↔ 中文意思":"原有配對"}／${cfg.dir==="term"?"字→意":"雙向"}`;
+    `${MATCH_LABELS[cfg.matchLanguage]||MATCH_LABELS.original}／${cfg.dir==="term"?"字→意":"雙向"}`;
   activePlayLog={states,record:{id:crypto.randomUUID(),startedAt:Date.now(),endedAt:null,status:"running",game,mode,deck:deck.name,settings,total,
     players:names.slice(0,mode==="vs"?2:1).map(name=>({name,correct:0,mistakes:0,score:null,seconds:0,result:""}))}};
   states.forEach((state,index)=>state.logName=names[index]);
@@ -1160,7 +1163,7 @@ function renderDeckList(){
     el.onclick=()=>{ selectedDeckId=d.id; renderDeckList(); };
     wrap.appendChild(el);
   });
-  updateStartMeta();
+  refreshStartOpts();
 }
 function updateStartMeta(){
   const d=decks.find(x=>x.id===selectedDeckId);
@@ -1207,6 +1210,16 @@ const START_TXT = {
   "solo|whack":  { btn:"開始打地鼠 🔨", hint:"正確與錯誤答案會自動冒出；只敲符合題目的地鼠，答錯或太慢會失去愛心。" }
 };
 function refreshStartOpts(){
+  const deck=decks.find(item=>item.id===selectedDeckId);
+  const verbDeck=Boolean(deck?.pairs.length&&deck.pairs.every(MATCH_CONTENT.verbForms));
+  if(verbDeck&&cfg.matchLanguage==="original")cfg.matchLanguage="past";
+  if(!verbDeck&&["past","participle"].includes(cfg.matchLanguage))cfg.matchLanguage="original";
+  $$("#segMatchLanguage button").forEach(button=>{
+    const mode=button.dataset.language;
+    button.classList.toggle("opt-hidden",mode==="original"?verbDeck:mode==="zh"?false:!verbDeck);
+    button.classList.toggle("on",mode===cfg.matchLanguage);
+    button.setAttribute("aria-pressed",String(mode===cfg.matchLanguage));
+  });
   const spell = gtype==="spell";
   const vs = players==="vs";
   $("#playerTwoField").classList.toggle("opt-hidden",!vs);
@@ -1229,7 +1242,8 @@ function refreshStartOpts(){
   const detail=gtype==="maze"
     ? `${difficulty.label}：${difficulty.mazeSize}×${difficulty.mazeSize} 迷宮，怪物每 ${(difficulty.enemyMoveMs/1000).toFixed(2)} 秒移動。`
     : gtype==="whack" ? `${difficulty.label}：地鼠停留 ${(difficulty.whackStayMs/1000).toFixed(1)} 秒。` : "";
-  const matchingDetail=gtype==="match"&&cfg.matchLanguage==="zh"?" 英文 ↔ 中文意思：只抽有中譯的項目；中文意思相同的項目每輪只取一組。":"";
+  const matchingDetail=gtype!=="match"?"":cfg.matchLanguage==="zh"?" 英文 ↔ 中文意思：只抽有中譯的項目；中文意思相同的項目每輪只取一組。":
+    ["past","participle"].includes(cfg.matchLanguage)?` ${MATCH_LABELS[cfg.matchLanguage]}：每張答案卡只顯示此詞形；無此詞形的項目不出題。`:"";
   $("#startHint").textContent=t.hint+(detail?` ${detail}`:"")+matchingDetail;
   updateStartMeta();
 }
@@ -1253,10 +1267,10 @@ $("#segType").addEventListener("click",e=>{
 /* ================= 遊戲引擎（可同時跑多盤） ================= */
 function pickChosen(deck){
   const pairs=MATCH_CONTENT.matchingPairs(deck.pairs,cfg.matchLanguage);
-  if(pairs.length<2){toast(cfg.matchLanguage==="zh"?"這個字庫至少需要 2 組不同的中文意思；請在我的字庫補上中文。":"這個字庫至少需要 2 組字詞。","bad");return null;}
+  if(pairs.length<2){toast(`「${MATCH_LABELS[cfg.matchLanguage]}」至少需要 2 組不同且有效的答案，請檢查字庫內容。`,"bad");return null;}
   return shuffle(pairs).slice(0,Math.min(cfg.count,pairs.length));
 }
-function matchBestKey(deck){ return cfg.matchLanguage==="zh"?`${deck.id}|match|zh`:deck.id; }
+function matchBestKey(deck){ return cfg.matchLanguage==="original"?deck.id:`${deck.id}|match|${cfg.matchLanguage}`; }
 function makeCards(chosen){
   const cards=[];
   chosen.forEach((p,i)=>{
@@ -1276,7 +1290,9 @@ function renderInto(g){
     const el=document.createElement("button");
     el.type="button";
     el.className="tile";
-    const tag=c.side==="term"?(g.language==="zh"?"英文":"字詞"):(g.language==="zh"?"中文意思":"意思");
+    const verbMatch=["past","participle"].includes(g.language);
+    const tag=c.side==="term"?(verbMatch?"原形":g.language==="zh"?"英文":"字詞"):
+      ({zh:"中文意思",past:"過去式",participle:"過去分詞"}[g.language]||"意思");
     el.innerHTML=`<span class="side">${tag}</span>${esc(c.text)}`;
     el.setAttribute("aria-label", `${tag}：${c.text}`);
     el.setAttribute("aria-pressed", "false");
@@ -2287,6 +2303,7 @@ $("#btnDelDeck").onclick=()=>{
   decks=decks.filter(x=>x.id!==editId);
   delete best[editId]; delete best[`${editId}|maze`]; delete best[`${editId}|whack`];
   delete best[`${editId}|match|zh`];
+  delete best[`${editId}|match|past`]; delete best[`${editId}|match|participle`];
   saveBest(); saveDecks();
   editId=null; $("#editor").style.display="none"; $("#noDeck").style.display="block";
   renderMgr();
