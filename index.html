@@ -989,8 +989,10 @@ function loadDecks(){
       const d = JSON.parse(raw);
       if(Array.isArray(d)&&d.length){
         const needsBuiltinUpdate = localStorage.getItem(LS_BUILTIN) !== "ready";
+        const updates=localStorage.getItem("matchgame.builtin.v5")==="ready"
+          ? SAMPLE_DECKS.filter(deck=>deck.name==="動詞三態主題") : SAMPLE_DECKS;
         const migrated = needsBuiltinUpdate && window.mergeBuiltinDeckUpdates
-          ? window.mergeBuiltinDeckUpdates(d, SAMPLE_DECKS)
+          ? window.mergeBuiltinDeckUpdates(d, updates)
           : (window.prefixL4WeekDecks ? window.prefixL4WeekDecks(d) : d);
         try{
           if(migrated !== d) localStorage.setItem(LS_KEY, JSON.stringify(migrated));
