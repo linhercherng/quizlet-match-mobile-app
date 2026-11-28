@@ -8,7 +8,7 @@ for(const file of ["decks-v5.js","chinese-meanings.js"]){
   vm.runInContext(readFileSync(new URL("../"+file,import.meta.url),"utf8"),context);
 }
 const decks=context.window.BUILTIN_DECKS;
-const {chineseMeaning,matchingPairs}=context.window.MATCH_CONTENT;
+const {chineseMeaning,verbForms,matchingPairs}=context.window.MATCH_CONTENT;
 const copy=value=>JSON.parse(JSON.stringify(value));
 
 test("all 793 built-in entries have Traditional Chinese meanings without changing the original pairs",()=>{
@@ -59,4 +59,35 @@ test("fallback and custom Chinese decks still work when the built-in word bank c
   const fallback=vm.createContext({window:{}});
   vm.runInContext(readFileSync(new URL("../chinese-meanings.js",import.meta.url),"utf8"),fallback);
   assert.deepEqual(copy(fallback.window.MATCH_CONTENT.matchingPairs([["cat","貓"],["dog","狗"]],"zh")),[["cat","貓"],["dog","狗"]]);
+});
+
+test("verb matching separates past and participle cards while preserving alternatives and the saved bank",()=>{
+  const theme=decks.find(deck=>deck.name==="動詞三態主題");
+  const before=JSON.stringify(decks);
+  const past=matchingPairs(theme.pairs,"past");
+  const participle=matchingPairs(theme.pairs,"participle");
+  assert.equal(past.length,84);
+  assert.equal(participle.length,83);
+  assert.equal(past.find(pair=>pair[0]==="be")[1],"was / were");
+  assert.equal(past.find(pair=>pair[0]==="choose")[1],"chose");
+  assert.equal(participle.find(pair=>pair[0]==="choose")[1],"chosen");
+  assert.equal(participle.find(pair=>pair[0]==="bear")[1],"borne / born");
+  assert.equal(participle.find(pair=>pair[0]==="get")[1],"got / gotten");
+  assert.equal(participle.some(pair=>pair[0]==="can"),false);
+  for(const language of ["past","participle"]){
+    for(const deck of decks.filter(deck=>deck.pairs.every(verbForms))){
+      for(const pair of matchingPairs(deck.pairs,language)){
+        assert.doesNotMatch(pair[1],/過去式：|過去分詞：|｜/);
+        assert.equal(pair[1],verbForms(deck.pairs.find(raw=>raw[0]===pair[0]))[language==="past"?0:1]);
+      }
+    }
+  }
+  assert.equal(JSON.stringify(decks),before);
+});
+
+test("verb modes exclude missing forms, non-verbs and ambiguous duplicate answers",()=>{
+  const pairs=[["first","過去式：went｜過去分詞：gone"],["second","過去式：went｜過去分詞：—"],["third","過去式：｜過去分詞：-"],["cat","a cat"]];
+  assert.deepEqual(copy(matchingPairs(pairs,"past")),[["first","went"]]);
+  assert.deepEqual(copy(matchingPairs(pairs,"participle")),[["first","gone"]]);
+  assert.equal(verbForms(pairs[3]),null);
 });

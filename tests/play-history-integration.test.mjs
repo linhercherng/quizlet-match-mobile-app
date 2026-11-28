@@ -83,3 +83,14 @@ test("Chinese matching sessions identify the chosen content in play history",()=
   run('startPlayLog(deck,"match","solo",4,states);closePlayLog("completed");');
   assert.match(logs()[0].settings,/英文 ↔ 中文意思/);
 });
+
+test("past and participle sessions retain distinct matching names in play history",()=>{
+  for(const [language,label] of [["past","原形 ↔ 過去式"],["participle","原形 ↔ 過去分詞"]]){
+    const {context,run,logs}=app();
+    context.cfg.matchLanguage=language;
+    context.states=[{total:4,remain:0,miss:0,startAt:1000,finalT:4}];
+    run('startPlayLog(deck,"match","solo",4,states);closePlayLog("completed");');
+    assert.equal(logs()[0].game,"match");
+    assert.equal(logs()[0].settings,`${label}／雙向`);
+  }
+});

@@ -49,15 +49,21 @@
     if(typeof pair[2]==="string"&&pair[2].trim())return pair[2].trim();
     return translations.get(key(pair))||(/\p{Script=Han}/u.test(pair[1])&&!/^過去式：/.test(pair[1])?pair[1]:"");
   }
+  function verbForms(pair){
+    const forms=typeof pair[1]==="string"&&pair[1].match(/^過去式：(.*?)｜過去分詞：(.*?)$/);
+    return forms?forms.slice(1).map(form=>form.trim()):null;
+  }
   function matchingPairs(pairs,language){
-    if(language!=="zh")return pairs.map(pair=>pair.slice(0,2));
+    if(!["zh","past","participle"].includes(language))return pairs.map(pair=>pair.slice(0,2));
     const meaningsSeen=new Set();
     return pairs.flatMap(pair=>{
-      const chinese=chineseMeaning(pair);
-      if(!chinese||meaningsSeen.has(chinese))return [];
-      meaningsSeen.add(chinese);
-      return [[pair[0],chinese]];
+      const answer=language==="zh"?chineseMeaning(pair):verbForms(pair)?.[language==="past"?0:1];
+      if(!answer||/^(?:[—–-]+|無|（無）)$/.test(answer))return [];
+      const normalized=answer.toLocaleLowerCase().replace(/\s+/g," ");
+      if(meaningsSeen.has(normalized))return [];
+      meaningsSeen.add(normalized);
+      return [[pair[0],answer]];
     });
   }
-  global.MATCH_CONTENT=Object.freeze({chineseMeaning,matchingPairs});
+  global.MATCH_CONTENT=Object.freeze({chineseMeaning,verbForms,matchingPairs});
 })(window);
