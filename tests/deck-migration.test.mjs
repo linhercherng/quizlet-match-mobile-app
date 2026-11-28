@@ -43,3 +43,24 @@ test("a failed migration write retains the complete prior library instead of fal
   assert.match(app.warning.textContent,/既有字庫仍保留/);
   assert.equal(app.values.has("matchgame.builtin.v6"),false);
 });
+
+test("adding the verb theme does not restore L6 decks deleted after the previous update",()=>{
+  const app=setup();
+  const saved=app.saved.filter(deck=>!deck.name.startsWith("L6 "));
+  app.values.set("matchgame.decks.v4",JSON.stringify(saved));
+  const migrated=JSON.parse(JSON.stringify(app.load()));
+  assert.equal(migrated.length,saved.length+1);
+  assert.deepEqual(migrated.slice(0,-1),saved);
+  assert.equal(migrated.at(-1).name,"動詞三態主題");
+  assert.equal(migrated.some(deck=>deck.name.startsWith("L6 ")),false);
+});
+
+test("older libraries that have never received the L6 update still receive L6 and the new theme",()=>{
+  const app=setup();
+  app.values.delete("matchgame.builtin.v5");
+  app.values.set("matchgame.decks.v4",JSON.stringify(app.saved.filter(deck=>!deck.name.startsWith("L6 "))));
+  const migrated=app.load();
+  assert.equal(migrated.filter(deck=>deck.name.startsWith("L6 ")).length,17);
+  assert.equal(migrated.filter(deck=>deck.name==="動詞三態主題").length,1);
+  assert.deepEqual(JSON.parse(JSON.stringify(migrated.find(deck=>deck.id==="custom"))),app.saved.at(-1));
+});

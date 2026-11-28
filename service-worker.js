@@ -1,11 +1,11 @@
 "use strict";
 
-const CACHE_NAME = "match-master-v22";
+const CACHE_NAME = "match-master-v23";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./decks-v5.js",
-  "./chinese-meanings.js",
+  "./decks-v5.js?v=23",
+  "./chinese-meanings.js?v=23",
   "./game-templates-v1.js",
   "./play-history.js",
   "./manifest.webmanifest",
