@@ -28,7 +28,7 @@ test("app shell includes phone installation and safe-area support", async () => 
   assert.match(html, /safe-area-inset-bottom/);
   assert.match(html, /grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(html, /matchgame\.decks\.v4/);
-  assert.match(html, /matchgame\.builtin\.v5/);
+  assert.match(html, /matchgame\.builtin\.v6/);
 });
 
 test("app shell offers Maze Chase and Whack-a-Mole mobile templates", async () => {
@@ -128,7 +128,7 @@ test("iPad landscape keeps maze controls visible and disables double-tap zoom", 
 test("service worker caches every offline-critical asset", async () => {
   const worker = await read("service-worker.js");
 
-  assert.match(worker, /const CACHE_NAME = "match-master-v21"/);
+  assert.match(worker, /const CACHE_NAME = "match-master-v22"/);
   for (const asset of [
     "./",
     "./index.html",

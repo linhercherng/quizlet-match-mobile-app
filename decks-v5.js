@@ -3043,6 +3043,98 @@ window.BUILTIN_DECKS = [
   }
 ];
 
+/* Verb forms and Chinese meanings supplied by the user. */
+window.BUILTIN_DECKS.push({
+  emoji:"🔄",
+  name:"動詞三態主題",
+  pairs:[
+    ["be","was / were","been","是；在"],
+    ["bear","bore","borne / born","承受；生育"],
+    ["become","became","become","成為；變成"],
+    ["begin","began","begun","開始"],
+    ["bite","bit","bitten","咬"],
+    ["blow","blew","blown","吹"],
+    ["break","broke","broken","打破；弄壞"],
+    ["bring","brought","brought","帶來"],
+    ["build","built","built","建造"],
+    ["burn","burned / burnt","burned / burnt","燃燒；燒傷"],
+    ["buy","bought","bought","買"],
+    ["can","could","—","能；會；可以"],
+    ["catch","caught","caught","接住；抓住；趕上"],
+    ["choose","chose","chosen","選擇"],
+    ["come","came","come","來"],
+    ["cost","cost","cost","花費（金錢）"],
+    ["cut","cut","cut","切；割"],
+    ["do","did","done","做"],
+    ["draw","drew","drawn","畫；拉"],
+    ["dream","dreamed / dreamt","dreamed / dreamt","做夢；夢想"],
+    ["drink","drank","drunk","喝"],
+    ["drive","drove","driven","開車；駕駛"],
+    ["eat","ate","eaten","吃"],
+    ["fall","fell","fallen","落下；跌倒"],
+    ["feed","fed","fed","餵食"],
+    ["feel","felt","felt","感覺；覺得"],
+    ["find","found","found","找到；發現"],
+    ["fly","flew","flown","飛；搭飛機"],
+    ["forget","forgot","forgotten","忘記"],
+    ["get","got","got / gotten","得到；取得；變得"],
+    ["give","gave","given","給"],
+    ["go","went","gone","去"],
+    ["grow","grew","grown","成長；種植"],
+    ["have","had","had","有；吃；喝"],
+    ["hear","heard","heard","聽見"],
+    ["hide","hid","hidden","隱藏；躲藏"],
+    ["hit","hit","hit","打；擊中"],
+    ["hold","held","held","握住；舉行"],
+    ["hurt","hurt","hurt","受傷；使疼痛"],
+    ["keep","kept","kept","保持；保留"],
+    ["know","knew","known","知道；認識"],
+    ["learn","learned / learnt","learned / learnt","學習"],
+    ["leave","left","left","離開；留下"],
+    ["let","let","let","讓；允許"],
+    ["lie","lay","lain","躺；平放"],
+    ["light","lit / lighted","lit / lighted","點燃；照亮"],
+    ["lose","lost","lost","遺失；輸掉"],
+    ["make","made","made","製作；使"],
+    ["mean","meant","meant","意思是；意指"],
+    ["meet","met","met","遇見；見面"],
+    ["pay","paid","paid","付款；支付"],
+    ["put","put","put","放；放置"],
+    ["quit","quit / quitted","quit / quitted","停止；辭職"],
+    ["read","read","read","閱讀"],
+    ["ride","rode","ridden","騎；乘坐"],
+    ["ring","rang","rung","鳴響；打電話"],
+    ["run","ran","run","跑"],
+    ["say","said","said","說"],
+    ["see","saw","seen","看見"],
+    ["sell","sold","sold","賣"],
+    ["send","sent","sent","寄送；傳送"],
+    ["shake","shook","shaken","搖動；發抖"],
+    ["shine","shone / shined","shone / shined","發光；照耀"],
+    ["shut","shut","shut","關閉"],
+    ["sing","sang","sung","唱歌"],
+    ["sit","sat","sat","坐"],
+    ["sleep","slept","slept","睡覺"],
+    ["speak","spoke","spoken","說話"],
+    ["spend","spent","spent","花費（金錢、時間）"],
+    ["spell","spelled / spelt","spelled / spelt","拼寫"],
+    ["spread","spread","spread","展開；散播"],
+    ["stand","stood","stood","站立"],
+    ["steal","stole","stolen","偷"],
+    ["swim","swam","swum","游泳"],
+    ["take","took","taken","拿；帶走；搭乘"],
+    ["teach","taught","taught","教導"],
+    ["tell","told","told","告訴"],
+    ["think","thought","thought","想；認為"],
+    ["throw","threw","thrown","丟；投擲"],
+    ["understand","understood","understood","了解；理解"],
+    ["wake","woke","woken","醒來；叫醒"],
+    ["wear","wore","worn","穿；戴"],
+    ["win","won","won","贏；獲勝"],
+    ["write","wrote","written","寫"]
+  ].map(([base,past,participle,chinese])=>[base,`過去式：${past}｜過去分詞：${participle}`,chinese])
+});
+
 window.prefixL4WeekDecks = function prefixL4WeekDecks(decks) {
   let changed = false;
   const migrated = decks.map((deck) => {
@@ -3056,8 +3148,8 @@ window.prefixL4WeekDecks = function prefixL4WeekDecks(decks) {
 window.mergeBuiltinDeckUpdates = function mergeBuiltinDeckUpdates(savedDecks, builtinDecks) {
   const migrated = window.prefixL4WeekDecks(savedDecks);
   const savedNames = new Set(migrated.map((deck) => deck.name));
-  const missingL6Decks = builtinDecks.filter(
-    (deck) => /^L6 (?:Week \d+|動詞三態)$/.test(deck.name) && !savedNames.has(deck.name)
+  const missingDecks = builtinDecks.filter(
+    (deck) => (/^L6 (?:Week \d+|動詞三態)$/.test(deck.name) || deck.name === "動詞三態主題") && !savedNames.has(deck.name)
   );
-  return missingL6Decks.length ? [...migrated, ...missingL6Decks] : migrated;
+  return missingDecks.length ? [...migrated, ...missingDecks] : migrated;
 };
